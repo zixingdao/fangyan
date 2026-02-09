@@ -1,0 +1,19 @@
+node_modules/
+dist/
+build/
+out/
+.env
+.env.*
+! .env.example
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.vscode/
+.idea/
+*.sqlite
+*.sqlite-journal
+coverage/
+.trae/

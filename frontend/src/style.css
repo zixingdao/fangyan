@@ -1,0 +1,84 @@
+:root {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* 长沙方言主题色 */
+  --cs-red: #D32F2F;        /* 辣椒红 */
+  --cs-red-light: #FFCDD2;
+  --cs-red-dark: #B71C1C;
+  --cs-orange: #FF5722;     /* 活力橙 */
+  --cs-blue: #1976D2;       /* 湘江蓝 */
+  --cs-bg: #FAFAFA;         /* 浅灰背景 */
+  --cs-text-main: #333333;
+  --cs-text-secondary: #666666;
+
+  color-scheme: light;
+  color: var(--cs-text-main);
+  background-color: var(--cs-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--cs-bg);
+}
+
+a {
+  font-weight: 500;
+  color: var(--cs-red);
+  text-decoration: inherit;
+  transition: color 0.3s;
+}
+a:hover {
+  color: var(--cs-red-dark);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--cs-text-main);
+  font-weight: 600;
+  margin: 0 0 0.5em 0;
+}
+
+/* 覆盖 Element Plus 主题色 (部分) */
+:root {
+  --el-color-primary: var(--cs-red) !important;
+  --el-color-primary-light-3: #E57373 !important;
+  --el-color-primary-light-5: #EF9A9A !important;
+  --el-color-primary-light-7: #FFCDD2 !important;
+  --el-color-primary-light-9: #FFEBEE !important;
+  --el-color-primary-dark-2: #B71C1C !important;
+}
+
+.card {
+  padding: 2em;
+}
+
+/* 通用容器 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
