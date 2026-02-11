@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-gray-900;
+  }
+}
+
+/* 自定义字体加载 (假设字体文件在 public/fonts 下或通过 Google Fonts 引入) */
+/* 这里暂时使用系统字体回退 */

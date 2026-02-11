@@ -1,0 +1,13 @@
+{
+  "name": "changsha-dialect-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "pnpm": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}
