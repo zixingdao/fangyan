@@ -58,7 +58,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== UserRole.ADMIN) {
+  if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
     return <Navigate to="/login" replace />;
   }
 
