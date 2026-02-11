@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { api } from '../lib/axios';
 import { UserStatus, UserRole, RECORDING_TITLES, ANNOTATION_TITLES, getTitleByDuration } from '@changsha/shared';
-import { CheckCircle, XCircle, Search, Trash2, Upload, Edit, Mic, Tag, Users } from 'lucide-react';
+import { CheckCircle, XCircle, Search, Trash2, Upload, Edit, Mic, Tag, Users, Plus } from 'lucide-react';
 import clsx from 'clsx';
 
 const formatDuration = (seconds: number) => {
@@ -19,6 +19,16 @@ export const UsersPage = () => {
   const [search, setSearch] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newUser, setNewUser] = useState({
+    student_id: '',
+    name: '',
+    phone: '',
+    school: '邵阳学院',
+    password: '',
+    role: UserRole.USER,
+    status: UserStatus.PENDING,
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchUsers = async () => {
@@ -77,6 +87,31 @@ export const UsersPage = () => {
   const openEdit = (user: any) => {
     setCurrentUser({ ...user });
     setIsEditing(true);
+  };
+
+  const openCreate = () => {
+    setNewUser({
+      student_id: '',
+      name: '',
+      phone: '',
+      school: '邵阳学院',
+      password: '',
+      role: UserRole.USER,
+      status: UserStatus.PENDING,
+    });
+    setIsCreating(true);
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post('/admin/users', newUser);
+      setIsCreating(false);
+      fetchUsers();
+    } catch (error: any) {
+      console.error(error);
+      alert(error?.message || '创建失败');
+    }
   };
 
   const handleImportTrial = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,13 +210,22 @@ export const UsersPage = () => {
               className="hidden"
               accept=".csv,.txt"
             />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 flex items-center gap-2 text-sm font-medium transition-colors"
-            >
-              <Upload size={16} />
-              导入试音结果
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={openCreate}
+                className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center gap-2 text-sm font-medium transition-colors"
+              >
+                <Plus size={16} />
+                新增账号
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 flex items-center gap-2 text-sm font-medium transition-colors"
+              >
+                <Upload size={16} />
+                导入试音结果
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -413,6 +457,118 @@ export const UsersPage = () => {
                   className="flex-1 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
                 >
                   保存
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isCreating && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-2xl w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-6">新增账号</h2>
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">学号</label>
+                  <input
+                    type="text"
+                    value={newUser.student_id}
+                    onChange={(e) => setNewUser({ ...newUser, student_id: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-100"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                  <input
+                    type="text"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-100"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">手机号</label>
+                  <input
+                    type="text"
+                    value={newUser.phone}
+                    onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-100"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">学校</label>
+                  <input
+                    type="text"
+                    value={newUser.school}
+                    onChange={(e) => setNewUser({ ...newUser, school: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-100"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-100"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">角色</label>
+                  <select
+                    value={newUser.role}
+                    onChange={(e) => setNewUser({ ...newUser, role: e.target.value as any })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-100"
+                  >
+                    <option value={UserRole.USER}>普通用户</option>
+                    <option value={UserRole.ADMIN}>管理员</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                  <select
+                    value={newUser.status}
+                    onChange={(e) => setNewUser({ ...newUser, status: +e.target.value as any })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-100"
+                  >
+                    <option value={UserStatus.PENDING}>待审核</option>
+                    {/* @ts-ignore */}
+                    <option value={UserStatus.TRIAL_PASSED}>试音通过</option>
+                    {/* @ts-ignore */}
+                    <option value={UserStatus.RECORDING_SUCCESS}>录音成功</option>
+                    {/* @ts-ignore */}
+                    <option value={UserStatus.ANNOTATION_SUCCESS}>标注成功</option>
+                    <option value={UserStatus.REJECTED}>封禁账号</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setIsCreating(false)}
+                  className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
+                >
+                  创建
                 </button>
               </div>
             </form>

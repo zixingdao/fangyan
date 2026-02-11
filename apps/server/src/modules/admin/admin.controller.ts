@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from '../../common/guards/admin.guard';
 import { UserStatus, RecordStatus } from '@changsha/shared';
 import { ImportTrialDto, ImportRecordingDto } from './dto/import.dto';
+import { AdminCreateUserDto } from './dto/create-user.dto';
 
 @Controller('admin')
 @UseGuards(AuthGuard('jwt'), AdminGuard)
@@ -18,6 +19,11 @@ export class AdminController {
   @Put('users/:id/audit')
   auditUser(@Param('id') id: string, @Body() body: { status?: UserStatus; total_duration?: number; annotation_duration?: number }) {
     return this.adminService.updateUser(+id, body);
+  }
+
+  @Post('users')
+  createUser(@Body() dto: AdminCreateUserDto) {
+    return this.adminService.createUser(dto);
   }
 
   @Post('users/import-trial')

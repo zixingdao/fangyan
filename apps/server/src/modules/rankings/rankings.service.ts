@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Ranking } from './ranking.entity';
 import { User } from '../users/user.entity';
-import { RankType } from '@changsha/shared';
+import { RankType, UserRole } from '@changsha/shared';
 
 @Injectable()
 export class RankingsService {
@@ -21,6 +21,7 @@ export class RankingsService {
     
     // 方法1：直接从 Users 表查（实时）
     const users = await this.usersRepository.find({
+      where: { role: Not(UserRole.ADMIN) },
       order: { total_duration: 'DESC' },
       take: limit,
       select: ['id', 'name', 'school', 'total_duration', 'hometown'],

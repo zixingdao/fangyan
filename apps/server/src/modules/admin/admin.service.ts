@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { User } from '../users/user.entity';
@@ -6,6 +6,8 @@ import { Recording } from '../recordings/recording.entity';
 import { UserRole, UserStatus, RecordStatus, RecordType, LogType, LogLevel } from '@changsha/shared';
 import { ImportTrialDto, ImportRecordingDto } from './dto/import.dto';
 import { LogsService } from '../logs/logs.service';
+import * as bcrypt from 'bcryptjs';
+import { AdminCreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AdminService {
@@ -62,6 +64,37 @@ export class AdminService {
     );
 
     return { success: true };
+  }
+
+  async createUser(dto: AdminCreateUserDto, adminId?: number) {
+    const existed = await this.usersRepository.findOne({ where: { student_id: dto.student_id } });
+    if (existed) {
+      throw new BadRequestException('学号已存在');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const user = this.usersRepository.create({
+      student_id: dto.student_id,
+      phone: dto.phone,
+      name: dto.name,
+      password: hashedPassword,
+      school: dto.school,
+      hometown: dto.hometown,
+      role: dto.role ?? UserRole.USER,
+      status: dto.status ?? UserStatus.PENDING,
+    });
+    const saved = await this.usersRepository.save(user);
+
+    await this.logsService.create(
+      adminId || null,
+      '创建用户',
+      LogType.SYSTEM,
+      LogLevel.INFO,
+      JSON.stringify({ userId: saved.id, student_id: saved.student_id, role: saved.role, status: saved.status }),
+    );
+
+    const { password, ...safe } = saved as any;
+    return safe;
   }
 
   // 兼容旧接口
