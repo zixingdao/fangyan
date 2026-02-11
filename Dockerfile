@@ -63,8 +63,9 @@ COPY packages/shared/package.json ./packages/shared/
 COPY packages/ui/package.json ./packages/ui/
 COPY apps/server/package.json ./apps/server/
 
-# 安装生产依赖
-RUN corepack enable && pnpm install --prod --no-frozen-lockfile
+# 为了避免 postinstall 脚本尝试编译原生依赖（如 sql.js/sqlite3）导致失败或警告
+# 我们添加 --ignore-scripts
+RUN corepack enable && pnpm install --prod --no-frozen-lockfile --ignore-scripts
 
 # 关键修复：确保 NestJS 运行时能找到 dist 下的文件
 # 复制共享库的构建产物（因为 NestJS 运行时可能需要引用）
@@ -96,6 +97,6 @@ COPY apps/server/ecosystem.config.js ./apps/server/
 
 WORKDIR /app/apps/server
 
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["node", "dist/main"]
