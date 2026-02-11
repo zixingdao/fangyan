@@ -168,15 +168,15 @@ export const GuidePage = () => {
 
               {/* Mobile Tips (Collapsible or simplified) */}
               <div className="lg:hidden mb-8">
-                 <div className="bg-yellow-50/80 rounded-2xl p-4 border border-yellow-100/50 shadow-sm backdrop-blur-sm">
-                   <div className="flex items-center gap-2 text-yellow-800 font-bold mb-2 text-sm">
-                    <Lightbulb size={16} className="text-yellow-600" />
+                 <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 shadow-sm">
+                   <div className="flex items-center gap-2 text-amber-900 font-bold mb-3 text-sm">
+                    <Lightbulb size={18} className="text-amber-600" />
                     <span>录制小贴士</span>
                   </div>
-                  <div className="text-xs text-yellow-800/70 leading-relaxed grid grid-cols-1 gap-1.5 pl-1">
+                  <div className="text-sm text-amber-950 leading-relaxed grid grid-cols-1 gap-2.5 pl-1">
                      {(currentData.tips || []).slice(0, 3).map((tip: string, idx: number) => (
-                       <div key={idx} className="flex items-start gap-1.5">
-                         <span className="mt-1 w-1 h-1 rounded-full bg-yellow-400 shrink-0"></span>
+                       <div key={idx} className="flex items-start gap-2">
+                         <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
                          <span>{tip}</span>
                        </div>
                      ))}
@@ -186,16 +186,16 @@ export const GuidePage = () => {
 
               {/* Angles */}
               {currentScenario.angles && (
-                <div className="mb-6 lg:mb-10 bg-blue-50/50 border border-blue-100 rounded-2xl p-4 lg:p-6">
-                  <div className="text-blue-600 font-bold mb-3 lg:mb-4 flex items-center gap-2 text-sm lg:text-base">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                <div className="mb-6 lg:mb-10 bg-indigo-50 border border-indigo-100 rounded-2xl p-5 lg:p-6">
+                  <div className="text-indigo-800 font-bold mb-4 lg:mb-4 flex items-center gap-2 text-sm lg:text-base">
+                    <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
                     推荐叙述角度
                   </div>
-                  <div className="grid gap-2 lg:gap-3">
+                  <div className="grid gap-3 lg:gap-3">
                     {currentScenario.angles?.map((angle: string, idx: number) => (
-                      <div key={idx} className="flex items-start gap-3 text-gray-600 bg-white/60 p-2.5 lg:p-3 rounded-lg text-sm lg:text-base">
-                        <span className="text-blue-400 mt-1">•</span>
-                        {angle}
+                      <div key={idx} className="flex items-start gap-3 text-gray-800 bg-white p-3.5 lg:p-3 rounded-xl border border-indigo-100/50 shadow-sm text-sm lg:text-base">
+                        <span className="text-indigo-400 mt-0.5 font-bold">•</span>
+                        <span className="leading-relaxed">{angle}</span>
                       </div>
                     ))}
                   </div>
