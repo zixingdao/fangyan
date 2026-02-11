@@ -28,7 +28,7 @@ export class RecordingsController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
+          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB (录音文件可能较大)
           // new FileTypeValidator({ fileType: 'audio/*' }), // 暂时放宽类型限制以便测试
         ],
       }),

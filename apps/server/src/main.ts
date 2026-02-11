@@ -6,6 +6,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as compression from 'compression';
+import { ViewController } from './view.controller';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,8 +28,10 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Global Prefix
-  app.setGlobalPrefix('api');
+  // Global Prefix (Exclude ViewController)
+  app.setGlobalPrefix('api', {
+    exclude: ['/', 'admin/(.*)', '*'], // 排除根路径、admin 路径和通配符路径
+  });
 
   // Global Validation Pipe (Zod)
   app.useGlobalPipes(new ZodValidationPipe());

@@ -12,24 +12,24 @@ export const UploadPage = () => {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 text-center">
-          <h1 className="text-2xl font-bold mb-6">加入长沙方言守护计划</h1>
+      <div className="max-w-2xl mx-auto px-4 md:px-0">
+        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 text-center">
+          <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">加入长沙方言守护计划</h1>
           
-          <div className="mb-8">
-            <div className="w-48 h-48 bg-gray-100 mx-auto rounded-xl flex items-center justify-center mb-4 border-2 border-dashed border-gray-300">
+          <div className="mb-6 md:mb-8">
+            <div className="w-40 h-40 md:w-48 md:h-48 bg-gray-100 mx-auto rounded-xl flex items-center justify-center mb-4 border-2 border-dashed border-gray-300">
               {/* Placeholder for QR Code */}
-              <span className="text-gray-400 font-medium">试音二维码占位</span>
+              <span className="text-gray-400 font-medium text-xs md:text-base">试音二维码占位</span>
             </div>
-            <p className="text-gray-500 text-sm">扫描上方二维码进行试音</p>
+            <p className="text-gray-500 text-xs md:text-sm">扫描上方二维码进行试音</p>
           </div>
 
-          <div className="mb-8 p-4 bg-yellow-50 rounded-xl border border-yellow-100 text-left">
-            <h3 className="font-bold text-yellow-800 mb-2 flex items-center gap-2">
+          <div className="mb-6 md:mb-8 p-4 bg-yellow-50 rounded-xl border border-yellow-100 text-left">
+            <h3 className="font-bold text-yellow-800 mb-2 flex items-center gap-2 text-sm md:text-base">
               <AlertCircle size={18} />
               试音说明
             </h3>
-            <p className="text-sm text-yellow-700 leading-relaxed mb-4">
+            <p className="text-xs md:text-sm text-yellow-700 leading-relaxed mb-4">
               为了确保语料质量，所有新用户需先完成试音。
               <br/>
               1. 请扫描上方二维码进入试音页面。
@@ -40,10 +40,10 @@ export const UploadPage = () => {
             </p>
             
             <div className="pt-4 border-t border-yellow-200">
-              <p className="text-sm text-yellow-800 font-bold mb-2">加入官方钉钉群：</p>
-              <div className="flex items-center gap-4">
-                <div className="w-24 h-24 bg-white rounded-lg flex items-center justify-center border border-yellow-200">
-                  <span className="text-xs text-gray-400">钉钉群二维码</span>
+              <p className="text-xs md:text-sm text-yellow-800 font-bold mb-2">加入官方钉钉群：</p>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-lg flex items-center justify-center border border-yellow-200">
+                  <span className="text-[10px] md:text-xs text-gray-400">钉钉群二维码</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-xs text-yellow-700">扫码或点击链接加入</span>

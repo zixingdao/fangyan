@@ -6,7 +6,8 @@ import { User } from '../users/user.entity';
 import { Recording } from '../recordings/recording.entity';
 import { Topic } from '../topics/topic.entity';
 import { LogsService } from '../logs/logs.service';
-import { LogType, LogLevel } from '@changsha/shared';
+import { LogType, LogLevel, UserRole, UserStatus } from '@changsha/shared';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class SystemService implements OnModuleInit {
@@ -41,6 +42,25 @@ export class SystemService implements OnModuleInit {
       if (!config) {
         await this.configRepository.save(item);
       }
+    }
+
+    // 初始化默认管理员
+    const adminStudentId = '2041105052';
+    const admin = await this.usersRepository.findOne({ where: { student_id: adminStudentId } });
+    
+    if (!admin) {
+      const hashedPassword = await bcrypt.hash('xianglong1', 10);
+      const newAdmin = this.usersRepository.create({
+        student_id: adminStudentId,
+        password: hashedPassword,
+        name: '超级管理员',
+        phone: '19999999999', // 占位手机号
+        school: '邵阳学院',
+        role: UserRole.ADMIN,
+        status: UserStatus.TRIAL_PASSED, // 使用试音通过状态作为激活状态
+      });
+      await this.usersRepository.save(newAdmin);
+      console.log('默认管理员账户已创建: 2041105052');
     }
   }
 
@@ -196,7 +216,9 @@ export class SystemService implements OnModuleInit {
   async runBenchmark(duration: number, concurrency: number) {
     // 使用 node-fetch 真实发起请求来产生负载
     // 这样 RequestCounterMiddleware 就能捕获到流量了
-    const targetUrl = 'http://localhost:3000/api/system/stats';
+    const port = process.env.PORT || 80;
+    const baseUrl = `http://localhost:${port}`;
+    const targetUrl = `${baseUrl}/api/system/stats`;
     
     const startTime = Date.now();
     let requestsCompleted = 0;
@@ -213,15 +235,15 @@ export class SystemService implements OnModuleInit {
                 
                 if (rand < 0.7) { 
                     // 70% 概率：游客浏览 (轻量，高频)
-                    const res = await fetch('http://localhost:3000/api/system/stats');
+                    const res = await fetch(`${baseUrl}/api/system/stats`);
                     if (!res.ok) throw new Error('Stats API failed');
                 } else if (rand < 0.9) { 
                     // 20% 概率：查看指引 (中等)
-                    const res = await fetch('http://localhost:3000/api/system/guide');
+                    const res = await fetch(`${baseUrl}/api/system/guide`);
                     if (!res.ok) throw new Error('Guide API failed');
                 } else { 
                     // 10% 概率：尝试登录 (重负载，CPU 密集)
-                    const res = await fetch('http://localhost:3000/api/auth/login', {
+                    const res = await fetch(`${baseUrl}/api/auth/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ phone: '13800000000', password: 'wrong_password' })
