@@ -13,7 +13,7 @@ import { UserRole } from '@changsha/shared';
 
 import { SystemTestPage } from './pages/SystemTestPage';
 
-// 错误边界组件
+// 错误边界组件 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
     super(props);
