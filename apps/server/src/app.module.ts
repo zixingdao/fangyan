@@ -29,32 +29,48 @@ import { ViewController } from './view.controller';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot(
+      // 1. 优先托管静态资源目录 (static)，不进行 SPA 回退
       {
-        rootPath: join(__dirname, '..', 'public', 'user'),
-        serveRoot: '/',
-        exclude: ['/api/(.*)'],
+        rootPath: join(__dirname, '..', 'public', 'user', 'static'),
+        serveRoot: '/static', // 显式匹配 /static 路径
+        serveStaticOptions: {
+          setHeaders: (res) => {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          },
+        },
+      },
+      // 2. Admin 端的静态资源 (如果有冲突，建议 Admin 也改名或加前缀，目前假设 Admin 的 static 在 /admin/static)
+      {
+        rootPath: join(__dirname, '..', 'public', 'admin', 'static'),
+        serveRoot: '/admin/static',
+        serveStaticOptions: {
+          setHeaders: (res) => {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          },
+        },
+      },
+      // 3. Admin 端页面入口 (SPA)
+      {
+        rootPath: join(__dirname, '..', 'public', 'admin'),
+        serveRoot: '/admin',
+        exclude: ['/api/(.*)', '/static/(.*)'],
         serveStaticOptions: {
           setHeaders: (res, path) => {
             if (path.endsWith('index.html')) {
-              // HTML 不缓存，确保用户总是获取最新版本，避免 404
               res.setHeader('Cache-Control', 'no-cache');
-            } else {
-              // JS/CSS/图片等带有 Hash 的资源，强缓存 1 年
-              res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
             }
           },
         },
       },
+      // 4. Client 端页面入口 (SPA) - 放在最后作为兜底
       {
-        rootPath: join(__dirname, '..', 'public', 'admin'),
-        serveRoot: '/admin',
-        exclude: ['/api/(.*)'],
+        rootPath: join(__dirname, '..', 'public', 'user'),
+        serveRoot: '/',
+        exclude: ['/api/(.*)', '/admin/(.*)', '/static/(.*)'],
         serveStaticOptions: {
           setHeaders: (res, path) => {
             if (path.endsWith('index.html')) {
               res.setHeader('Cache-Control', 'no-cache');
-            } else {
-              res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
             }
           },
         },
