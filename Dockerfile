@@ -15,10 +15,11 @@ COPY package.json ./
 COPY packages/shared ./packages/shared
 COPY packages/ui ./packages/ui
 
-# Copy apps source
-COPY apps/client ./apps/client
-COPY apps/admin ./apps/admin
-COPY apps/server ./apps/server
+# Copy apps source (needed for dependencies resolution)
+# 我们需要把所有 apps 的 package.json 也复制过来，否则 pnpm install 可能会报错
+COPY apps/client/package.json ./apps/client/
+COPY apps/admin/package.json ./apps/admin/
+COPY apps/server/package.json ./apps/server/
 
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
@@ -26,24 +27,30 @@ RUN pnpm install --no-frozen-lockfile
 # Build shared
 RUN pnpm --filter @changsha/shared build
 
-# Build UI (since admin/client depend on it)
+# Build UI
 RUN pnpm --filter @changsha/ui build
 
 # Stage 2: Build Client (User)
 FROM base AS build-client
+COPY apps/client ./apps/client
 RUN pnpm --filter @changsha/client build
 
 # Stage 3: Build Admin
 FROM base AS build-admin
+COPY apps/admin ./apps/admin
 RUN pnpm --filter @changsha/admin build
 
 # Stage 4: Build Server
 FROM base AS build-server
+COPY apps/server ./apps/server
 RUN pnpm --filter @changsha/server build
 
 # Stage 5: Production
 FROM node:20-alpine AS production
 ENV NODE_ENV=production
+# 这一步非常重要，确保 pnpm 可用
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
 WORKDIR /app
 
@@ -56,7 +63,14 @@ COPY packages/shared/package.json ./packages/shared/
 COPY packages/ui/package.json ./packages/ui/
 COPY apps/server/package.json ./apps/server/
 
+# 安装生产依赖
 RUN corepack enable && pnpm install --prod --no-frozen-lockfile
+
+# 关键修复：确保 NestJS 运行时能找到 dist 下的文件
+# 复制共享库的构建产物（因为 NestJS 运行时可能需要引用）
+# 注意：这里我们从 base 阶段复制，因为 base 阶段执行了 build 命令
+COPY --from=base /app/packages/shared/dist ./packages/shared/dist
+COPY --from=base /app/packages/ui/dist ./packages/ui/dist
 
 # Copy built artifacts
 # 1. Server code
