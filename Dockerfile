@@ -22,7 +22,8 @@ COPY apps/admin/package.json ./apps/admin/
 COPY apps/server/package.json ./apps/server/
 
 # Install dependencies
-RUN pnpm install --no-frozen-lockfile
+# 增加 --ignore-scripts 来跳过所有包的生命周期脚本，避免 ts-node/bin 软链接创建失败的警告
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Build shared
 RUN pnpm --filter @changsha/shared build

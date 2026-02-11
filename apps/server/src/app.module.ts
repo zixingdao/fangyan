@@ -33,11 +33,31 @@ import { ViewController } from './view.controller';
         rootPath: join(__dirname, '..', 'public', 'user'),
         serveRoot: '/',
         exclude: ['/api/(.*)'],
+        serveStaticOptions: {
+          setHeaders: (res, path) => {
+            if (path.endsWith('index.html')) {
+              // HTML 不缓存，确保用户总是获取最新版本，避免 404
+              res.setHeader('Cache-Control', 'no-cache');
+            } else {
+              // JS/CSS/图片等带有 Hash 的资源，强缓存 1 年
+              res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+            }
+          },
+        },
       },
       {
         rootPath: join(__dirname, '..', 'public', 'admin'),
         serveRoot: '/admin',
         exclude: ['/api/(.*)'],
+        serveStaticOptions: {
+          setHeaders: (res, path) => {
+            if (path.endsWith('index.html')) {
+              res.setHeader('Cache-Control', 'no-cache');
+            } else {
+              res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+            }
+          },
+        },
       },
     ),
     TypeOrmModule.forRootAsync({
