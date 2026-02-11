@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/useAuthStore';
 import { Layout } from './components/Layout';
 import { LoginPage } from './pages/LoginPage';
@@ -68,7 +68,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter basename="/admin">
+      <HashRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           
@@ -89,7 +89,7 @@ function App() {
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </ErrorBoundary>
   );
 }
