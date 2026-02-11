@@ -1,6 +1,6 @@
 export default () => {
-  const type = process.env.DB_TYPE || 'sqljs';
-  // 允许通过 DB_SYNCHRONIZE 环境变量强制开启同步，否则仅在非生产环境开启
+  // 默认使用 sqlite (better-sqlite3) 以确保本地开发开箱即用
+  const type = process.env.DB_TYPE || 'sqlite';
   const synchronize = process.env.DB_SYNCHRONIZE === 'true' || process.env.NODE_ENV !== 'production';
 
   if (type === 'mysql') {
@@ -17,16 +17,18 @@ export default () => {
     };
   }
 
+  // SQLite (better-sqlite3) - 推荐用于开发环境
   if (type === 'sqlite') {
     return {
       database: {
-        type: 'sqlite',
-        database: process.env.DB_FILE || 'database_v2.sqlite',
+        type: 'better-sqlite3', // 使用 better-sqlite3 驱动，性能更好且无需编译
+        database: process.env.DB_FILE || 'database.sqlite',
         synchronize,
       },
     };
   }
 
+  // 兼容旧配置 sqljs
   return {
     database: {
       type: 'sqljs',

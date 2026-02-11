@@ -4,7 +4,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/', // 显式设置为根路径
+  base: './', // 使用相对路径，适配云开发部署
   plugins: [react()],
   resolve: {
     alias: {
