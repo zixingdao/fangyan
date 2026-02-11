@@ -21,7 +21,7 @@ COPY apps/admin ./apps/admin
 COPY apps/server ./apps/server
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Build shared
 RUN pnpm --filter @changsha/shared build
@@ -53,7 +53,7 @@ COPY packages/shared/package.json ./packages/shared/
 COPY packages/ui/package.json ./packages/ui/
 COPY apps/server/package.json ./apps/server/
 
-RUN corepack enable && pnpm install --prod --frozen-lockfile
+RUN corepack enable && pnpm install --prod --no-frozen-lockfile
 
 # Copy built artifacts
 # 1. Server code
