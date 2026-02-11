@@ -6,7 +6,8 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as compression from 'compression';
-import { ViewController } from './view.controller';
+import type { NextFunction, Request, Response } from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,9 +30,7 @@ async function bootstrap() {
   });
 
   // Global Prefix (Exclude ViewController)
-  app.setGlobalPrefix('api', {
-    exclude: ['/', 'admin/(.*)', '*'], // 排除根路径、admin 路径和通配符路径
-  });
+  app.setGlobalPrefix('api');
 
   // Global Validation Pipe (Zod)
   app.useGlobalPipes(new ZodValidationPipe());
@@ -52,6 +51,36 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
+
+  await app.init();
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.method !== 'GET') {
+      next();
+      return;
+    }
+    if (req.path.startsWith('/api')) {
+      next();
+      return;
+    }
+    if (req.path.startsWith('/static') || req.path.startsWith('/admin/static')) {
+      next();
+      return;
+    }
+    if (req.path.startsWith('/docs')) {
+      next();
+      return;
+    }
+    if (req.path.includes('.')) {
+      next();
+      return;
+    }
+
+    if (req.path.startsWith('/admin')) {
+      res.sendFile(join(__dirname, '..', 'public', 'admin', 'index.html'));
+      return;
+    }
+    res.sendFile(join(__dirname, '..', 'public', 'user', 'index.html'));
+  });
 
   const port = process.env.PORT || 80;
   await app.listen(port, '0.0.0.0');

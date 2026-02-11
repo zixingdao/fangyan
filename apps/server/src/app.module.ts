@@ -20,7 +20,6 @@ import { Topic } from './modules/topics/topic.entity';
 import { Log } from './modules/logs/log.entity';
 import { SystemConfig } from './modules/system/system-config.entity';
 import { RequestCounterMiddleware } from './request-counter.middleware';
-import { ViewController } from './view.controller';
 
 @Module({
   imports: [
@@ -95,7 +94,7 @@ import { ViewController } from './view.controller';
     SystemModule,
     MonitorModule,
   ],
-  controllers: [ViewController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {
