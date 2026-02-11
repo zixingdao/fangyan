@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthState>()(
       login: async (credentials) => {
         const response: any = await api.post('/auth/login', credentials);
         // Verify admin role
-        if (response.user.role !== UserRole.ADMIN) {
+        if (response.user.role !== UserRole.ADMIN && response.user.role !== UserRole.SUPER_ADMIN) {
             throw new Error('非管理员账号禁止访问');
         }
         set({ user: response.user, token: response.access_token });
