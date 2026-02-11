@@ -7,6 +7,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // 资源加载重试机制
+      window.addEventListener('error', function(e) {
+        if (e.target && (e.target.tagName === 'LINK' || e.target.tagName === 'SCRIPT')) {
+          var url = e.target.tagName === 'LINK' ? e.target.href : e.target.src;
+          console.warn('Resource load failed:', url);
+          // 这里可以添加逻辑：比如上报错误，或者提示用户
+          // 如果是关键资源缺失，通常只能提示用户刷新
+        }
+      }, true);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
