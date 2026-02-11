@@ -90,18 +90,18 @@ export const GuidePage = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentTopicIndex(index)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap border ${
+                  className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap border ${
                     currentTopicIndex === index
-                      ? 'bg-primary/10 border-primary/20 text-primary'
-                      : 'bg-white border-gray-200 text-gray-600'
+                      ? 'bg-primary/10 border-primary/20 text-primary shadow-sm'
+                      : 'bg-white border-gray-100 text-gray-500 hover:bg-gray-50'
                   }`}
                 >
-                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                    currentTopicIndex === index ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                    currentTopicIndex === index ? 'text-primary/70' : 'text-gray-300'
                   }`}>
-                    {index + 1}
+                    Topic {index + 1}
                   </span>
-                  {item.title}
+                  <span className="text-sm font-bold">{item.title}</span>
                 </button>
               ))}
             </div>
@@ -157,21 +157,31 @@ export const GuidePage = () => {
                   {currentScenario.title}
                 </h2>
                 {currentScenario.description && (
-                  <p className="text-sm lg:text-lg text-gray-500 font-light leading-relaxed max-w-2xl mx-auto px-4">
-                    {currentScenario.description}
-                  </p>
+                  <div className="relative">
+                    <p className="text-sm lg:text-lg text-gray-500 font-light leading-relaxed max-w-2xl mx-auto px-4 lg:px-0">
+                      {currentScenario.description}
+                    </p>
+                    <div className="lg:hidden absolute left-1/2 -translate-x-1/2 -bottom-3 w-12 h-1 bg-primary/20 rounded-full"></div>
+                  </div>
                 )}
               </div>
 
               {/* Mobile Tips (Collapsible or simplified) */}
-              <div className="lg:hidden mb-6 bg-yellow-50 rounded-xl p-4 border border-yellow-100">
-                 <div className="flex items-center gap-2 text-yellow-800 font-bold mb-2 text-sm">
-                  <Lightbulb size={14} />
-                  小贴士
-                </div>
-                <div className="text-xs text-yellow-800/80 leading-relaxed">
-                   {currentData.tips?.[0]}
-                </div>
+              <div className="lg:hidden mb-8">
+                 <div className="bg-yellow-50/80 rounded-2xl p-4 border border-yellow-100/50 shadow-sm backdrop-blur-sm">
+                   <div className="flex items-center gap-2 text-yellow-800 font-bold mb-2 text-sm">
+                    <Lightbulb size={16} className="text-yellow-600" />
+                    <span>录制小贴士</span>
+                  </div>
+                  <div className="text-xs text-yellow-800/70 leading-relaxed grid grid-cols-1 gap-1.5 pl-1">
+                     {(currentData.tips || []).slice(0, 3).map((tip: string, idx: number) => (
+                       <div key={idx} className="flex items-start gap-1.5">
+                         <span className="mt-1 w-1 h-1 rounded-full bg-yellow-400 shrink-0"></span>
+                         <span>{tip}</span>
+                       </div>
+                     ))}
+                  </div>
+                 </div>
               </div>
 
               {/* Angles */}
