@@ -15,7 +15,20 @@ export class AuthService {
 
   async validateUser(student_id: string, pass: string): Promise<any> {
     const user = await this.usersService.findByStudentId(student_id);
-    if (user && await bcrypt.compare(pass, user.password)) {
+    if (!user || !user.password) {
+      return null;
+    }
+
+    const stored = user.password;
+    const isBcryptHash = /^\$2[aby]\$\d{2}\$/.test(stored);
+    const ok = isBcryptHash ? await bcrypt.compare(pass, stored) : stored === pass;
+
+    if (ok && !isBcryptHash) {
+      const hashedPassword = await bcrypt.hash(pass, 10);
+      await this.usersService.updatePasswordHash(user.id, hashedPassword);
+    }
+
+    if (ok) {
       const { password, ...result } = user;
       return result;
     }

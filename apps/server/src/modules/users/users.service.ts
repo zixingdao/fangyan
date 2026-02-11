@@ -32,6 +32,10 @@ export class UsersService {
     });
   }
 
+  async updatePasswordHash(id: number, password: string) {
+    await this.usersRepository.update({ id }, { password });
+  }
+
   async remove(id: number) {
     await this.usersRepository.delete(id);
   }
