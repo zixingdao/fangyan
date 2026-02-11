@@ -12,8 +12,12 @@
     "@changsha/shared": "workspace:*",
     "@changsha/ui": "workspace:*",
     "axios": "^1.6.2",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.3",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
