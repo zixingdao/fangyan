@@ -28,7 +28,7 @@ export default defineConfig({
         // 优化分包策略，将第三方库单独打包，减少主包体积变化频率
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['antd', '@ant-design/icons'], // 假设使用了 antd
+          'ui-vendor': ['lucide-react'], // 替换为实际使用的库
         },
       },
     },

@@ -28,7 +28,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['antd', '@ant-design/icons'],
+          'ui-vendor': ['lucide-react'], // 替换为实际使用的库
         },
       },
     },
