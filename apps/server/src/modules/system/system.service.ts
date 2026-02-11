@@ -56,11 +56,16 @@ export class SystemService implements OnModuleInit {
         name: '超级管理员',
         phone: '19999999999', // 占位手机号
         school: '邵阳学院',
-        role: UserRole.ADMIN,
+        role: UserRole.SUPER_ADMIN,
         status: UserStatus.TRIAL_PASSED, // 使用试音通过状态作为激活状态
       });
       await this.usersRepository.save(newAdmin);
-      console.log('默认管理员账户已创建: 2041105052');
+      console.log('默认超级管理员账户已创建: 2041105052');
+    } else if (admin.role !== UserRole.SUPER_ADMIN) {
+        // 如果默认管理员已存在但不是超级管理员，升级它
+        admin.role = UserRole.SUPER_ADMIN;
+        await this.usersRepository.save(admin);
+        console.log('默认管理员账户已升级为超级管理员: 2041105052');
     }
   }
 

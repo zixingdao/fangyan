@@ -66,10 +66,18 @@ export class AdminService {
     return { success: true };
   }
 
-  async createUser(dto: AdminCreateUserDto, adminId?: number) {
+  async createUser(dto: AdminCreateUserDto, adminId: number) {
     const existed = await this.usersRepository.findOne({ where: { student_id: dto.student_id } });
     if (existed) {
       throw new BadRequestException('学号已存在');
+    }
+
+    // 检查权限：只有 SUPER_ADMIN 可以创建 ADMIN 或 SUPER_ADMIN
+    if (dto.role === UserRole.ADMIN || dto.role === UserRole.SUPER_ADMIN) {
+      const currentAdmin = await this.usersRepository.findOne({ where: { id: adminId } });
+      if (!currentAdmin || currentAdmin.role !== UserRole.SUPER_ADMIN) {
+        throw new BadRequestException('只有超级管理员可以创建管理员账号');
+      }
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);

@@ -3,6 +3,7 @@ import { api } from '../lib/axios';
 import { UserStatus, UserRole, RECORDING_TITLES, ANNOTATION_TITLES, getTitleByDuration } from '@changsha/shared';
 import { CheckCircle, XCircle, Search, Trash2, Upload, Edit, Mic, Tag, Users, Plus } from 'lucide-react';
 import clsx from 'clsx';
+import { useAuthStore } from '../store/useAuthStore'; // 引入 useAuthStore 获取当前登录用户
 
 const formatDuration = (seconds: number) => {
   const h = Math.floor(seconds / 3600);
@@ -14,6 +15,7 @@ const formatDuration = (seconds: number) => {
 };
 
 export const UsersPage = () => {
+  const { user: currentUserProfile } = useAuthStore(); // 获取当前登录用户信息
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -60,21 +62,13 @@ export const UsersPage = () => {
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // 假设后端有更新用户接口，这里可能需要新增一个
-      // 目前使用 audit 接口只能更新状态，需要扩展
-      // 暂时模拟更新状态和其他字段
       await api.put(`/admin/users/${currentUser.id}/audit`, { 
         status: currentUser.status,
         solo_duration: currentUser.solo_duration,
         dialogue_duration: currentUser.dialogue_duration,
         annotation_duration: currentUser.annotation_duration,
-        // total_duration 由后端根据 solo + dialogue 自动计算或手动传入，这里我们让它保持同步或者由后端处理
-        // 实际上我们的后端 update 接口是分别接收的，所以都传过去
         total_duration: (currentUser.solo_duration || 0) + (currentUser.dialogue_duration || 0),
       });
-      // 如果需要更新时长等数据，可能需要专门的接口
-      // 这里先假设只更新状态
-      
       setIsEditing(false);
       setCurrentUser(null);
       fetchUsers();
@@ -122,11 +116,10 @@ export const UsersPage = () => {
     reader.onload = async (event) => {
       const text = event.target?.result as string;
       const lines = text.split('\n').filter(l => l.trim());
-      // Skip header if present (simple check: if first line contains "studentId")
       const startIndex = lines[0]?.toLowerCase().includes('studentid') ? 1 : 0;
       
       const items = lines.slice(startIndex).map(line => {
-        const parts = line.split(/[,，]/).map(s => s.trim()); // Support Chinese/English comma
+        const parts = line.split(/[,，]/).map(s => s.trim());
         if (parts.length < 2) return null;
         const studentId = parts[0];
         const passedStr = parts[1];
@@ -287,9 +280,11 @@ export const UsersPage = () => {
                   <td className="px-6 py-4">
                     <span className={clsx(
                       "px-2 py-1 text-xs rounded-full",
-                      user.role === UserRole.ADMIN ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-600"
+                      user.role === UserRole.ADMIN ? "bg-purple-100 text-purple-800" : 
+                      user.role === UserRole.SUPER_ADMIN ? "bg-amber-100 text-amber-800" :
+                      "bg-gray-100 text-gray-600"
                     )}>
-                      {user.role === UserRole.ADMIN ? '管理员' : '普通用户'}
+                      {user.role === UserRole.ADMIN ? '管理员' : user.role === UserRole.SUPER_ADMIN ? '超级管理员' : '普通用户'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
@@ -534,7 +529,13 @@ export const UsersPage = () => {
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-100"
                   >
                     <option value={UserRole.USER}>普通用户</option>
-                    <option value={UserRole.ADMIN}>管理员</option>
+                    {/* 只有超级管理员可以选择管理员角色 */}
+                    {currentUserProfile?.role === UserRole.SUPER_ADMIN && (
+                      <>
+                        <option value={UserRole.ADMIN}>管理员</option>
+                        <option value={UserRole.SUPER_ADMIN}>超级管理员</option>
+                      </>
+                    )}
                   </select>
                 </div>
                 <div>

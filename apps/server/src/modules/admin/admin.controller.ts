@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Put, Request } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from '../../common/guards/admin.guard';
@@ -22,8 +22,8 @@ export class AdminController {
   }
 
   @Post('users')
-  createUser(@Body() dto: AdminCreateUserDto) {
-    return this.adminService.createUser(dto);
+  createUser(@Body() dto: AdminCreateUserDto, @Request() req) {
+    return this.adminService.createUser(dto, req.user.id);
   }
 
   @Post('users/import-trial')
