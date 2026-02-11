@@ -5,7 +5,15 @@ import { join } from 'path';
 @Controller()
 export class ViewController {
   @Get('admin/*')
-  serveAdmin(@Res() res: Response) {
+  serveAdmin(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    if (req.path.startsWith('/admin/static/')) {
+      next();
+      return;
+    }
+    if (req.path.includes('.')) {
+      next();
+      return;
+    }
     res.sendFile(join(__dirname, '..', 'public', 'admin', 'index.html'));
   }
 
@@ -18,6 +26,14 @@ export class ViewController {
         code: 404,
         msg: 'Not Found',
       });
+      return;
+    }
+    if (req.path.startsWith('/static/')) {
+      next();
+      return;
+    }
+    if (req.path.includes('.')) {
+      next();
       return;
     }
     // 否则返回前端页面
