@@ -18,7 +18,18 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/api/, ''), // Removed rewrite to match server global prefix
+      },
+    },
+  },
+  build: {
+    assetsDir: 'assets',
+    manifest: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['antd', '@ant-design/icons'],
+        },
       },
     },
   },
