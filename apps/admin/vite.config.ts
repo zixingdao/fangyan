@@ -22,7 +22,7 @@ export default defineConfig({
     },
   },
   build: {
-    assetsDir: 'assets',
+    assetsDir: 'static', // 强制修改资源目录名为 static
     manifest: true,
     rollupOptions: {
       output: {

@@ -22,7 +22,7 @@ export default defineConfig({
   },
   build: {
     // 显式配置构建选项，确保资源文件名的稳定性
-    assetsDir: 'assets',
+    assetsDir: 'static', // 强制修改资源目录名为 static，规避 cloudbase 对 assets 的潜在限制
     manifest: true, // 生成 manifest.json，方便服务端后续可能得映射
     rollupOptions: {
       output: {
