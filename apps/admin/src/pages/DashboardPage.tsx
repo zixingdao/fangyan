@@ -1,13 +1,25 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/axios';
-import { Users, Mic, FileText, AlertCircle, Activity, Server, HardDrive, Cpu, Clock, Database, Network, AlertTriangle, Loader2 } from 'lucide-react';
+import {
+  Users,
+  Mic,
+  FileText,
+  AlertCircle,
+  Activity,
+  Server,
+  HardDrive,
+  Cpu,
+  Clock,
+  Database,
+  Network,
+  Loader2,
+} from 'lucide-react';
 import clsx from 'clsx';
 
 export const DashboardPage = () => {
   const [stats, setStats] = useState<any>(null);
   const [serverStats, setServerStats] = useState<any>(null);
   const [monitorError, setMonitorError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const fetchStats = async () => {
     try {
@@ -32,8 +44,6 @@ export const DashboardPage = () => {
       }
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 

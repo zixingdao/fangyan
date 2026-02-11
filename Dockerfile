@@ -26,6 +26,9 @@ RUN pnpm install --no-frozen-lockfile
 # Build shared
 RUN pnpm --filter @changsha/shared build
 
+# Build UI (since admin/client depend on it)
+RUN pnpm --filter @changsha/ui build
+
 # Stage 2: Build Client (User)
 FROM base AS build-client
 RUN pnpm --filter @changsha/client build
