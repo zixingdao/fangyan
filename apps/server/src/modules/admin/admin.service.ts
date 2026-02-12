@@ -67,8 +67,11 @@ export class AdminService {
   }
 
   async createUser(dto: AdminCreateUserDto, adminId: number) {
+    console.log('Creating user with DTO:', JSON.stringify(dto, null, 2));
+    
     const existed = await this.usersRepository.findOne({ where: { student_id: dto.student_id } });
     if (existed) {
+      console.warn(`Create user failed: student_id ${dto.student_id} already exists`);
       throw new BadRequestException('学号已存在');
     }
 
@@ -76,33 +79,39 @@ export class AdminService {
     if (dto.role === UserRole.ADMIN || dto.role === UserRole.SUPER_ADMIN) {
       const currentAdmin = await this.usersRepository.findOne({ where: { id: adminId } });
       if (!currentAdmin || currentAdmin.role !== UserRole.SUPER_ADMIN) {
+        console.warn(`Create user failed: Admin ${adminId} tried to create admin/super_admin but is not super_admin`);
         throw new BadRequestException('只有超级管理员可以创建管理员账号');
       }
     }
 
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const user = this.usersRepository.create({
-      student_id: dto.student_id,
-      phone: dto.phone,
-      name: dto.name,
-      password: hashedPassword,
-      school: dto.school,
-      hometown: dto.hometown,
-      role: dto.role ?? UserRole.USER,
-      status: dto.status ?? UserStatus.PENDING,
-    });
-    const saved = await this.usersRepository.save(user);
+    try {
+      const hashedPassword = await bcrypt.hash(dto.password, 10);
+      const user = this.usersRepository.create({
+        student_id: dto.student_id,
+        phone: dto.phone,
+        name: dto.name,
+        password: hashedPassword,
+        school: dto.school,
+        hometown: dto.hometown,
+        role: dto.role ?? UserRole.USER,
+        status: dto.status ?? UserStatus.PENDING,
+      });
+      const saved = await this.usersRepository.save(user);
 
-    await this.logsService.create(
-      adminId || null,
-      '创建用户',
-      LogType.SYSTEM,
-      LogLevel.INFO,
-      JSON.stringify({ userId: saved.id, student_id: saved.student_id, role: saved.role, status: saved.status }),
-    );
+      await this.logsService.create(
+        adminId || null,
+        '创建用户',
+        LogType.SYSTEM,
+        LogLevel.INFO,
+        JSON.stringify({ userId: saved.id, student_id: saved.student_id, role: saved.role, status: saved.status }),
+      );
 
-    const { password, ...safe } = saved as any;
-    return safe;
+      const { password, ...safe } = saved as any;
+      return safe;
+    } catch (error) {
+      console.error('Error saving user to database:', error);
+      throw error;
+    }
   }
 
   // 兼容旧接口

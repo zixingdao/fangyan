@@ -30,6 +30,7 @@ export const UsersPage = () => {
     password: '',
     role: UserRole.USER,
     status: UserStatus.PENDING,
+    hometown: '',
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -92,6 +93,7 @@ export const UsersPage = () => {
       password: '',
       role: UserRole.USER,
       status: UserStatus.PENDING,
+      hometown: '',
     });
     setIsCreating(true);
   };
@@ -107,14 +109,21 @@ export const UsersPage = () => {
         role: newUser.role as UserRole,
         status: Number(newUser.status) as UserStatus, // status 是数字枚举，确保转为数字
         // CreateUserSchema 定义中可能没有 hometown 为必填，但为了保险起见可以加上
-        hometown: '', 
+        hometown: newUser.hometown || '', 
       };
 
+      console.log('Creating user with payload:', payload);
+
       await api.post('/admin/users', payload);
+      console.log('User created successfully');
       setIsCreating(false);
       fetchUsers();
     } catch (error: any) {
-      console.error(error);
+      console.error('Create user failed:', error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      }
       // 显示更详细的错误信息
       const message = error.response?.data?.message || error.message || '创建失败';
       alert(`创建失败: ${Array.isArray(message) ? message.join(', ') : message}`);
