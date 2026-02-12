@@ -194,8 +194,8 @@ export const GuidePage = () => {
                   <div className="grid gap-3 lg:gap-3">
                     {currentScenario.angles?.map((angle: string, idx: number) => (
                       <div key={idx} className="flex items-start gap-3 text-gray-800 bg-white p-3.5 lg:p-3 rounded-xl border border-indigo-100/50 shadow-sm text-sm lg:text-base">
-                        <span className="text-indigo-400 mt-0.5 font-bold">•</span>
-                        <span className="leading-relaxed">{angle}</span>
+                        <span className="text-indigo-400 mt-0.5 font-bold shrink-0">•</span>
+                        <span className="leading-relaxed break-words w-full">{angle}</span>
                       </div>
                     ))}
                   </div>
