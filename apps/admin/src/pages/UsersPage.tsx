@@ -99,12 +99,25 @@ export const UsersPage = () => {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/admin/users', newUser);
+      // 构造符合后端 DTO 要求的 payload
+      const payload = {
+        ...newUser,
+        // 显式转换枚举值为后端期望的格式
+        // 后端 zod schema 期望的是 nativeEnum (即字符串枚举值)
+        role: newUser.role as UserRole,
+        status: Number(newUser.status) as UserStatus, // status 是数字枚举，确保转为数字
+        // CreateUserSchema 定义中可能没有 hometown 为必填，但为了保险起见可以加上
+        hometown: '', 
+      };
+
+      await api.post('/admin/users', payload);
       setIsCreating(false);
       fetchUsers();
     } catch (error: any) {
       console.error(error);
-      alert(error?.message || '创建失败');
+      // 显示更详细的错误信息
+      const message = error.response?.data?.message || error.message || '创建失败';
+      alert(`创建失败: ${Array.isArray(message) ? message.join(', ') : message}`);
     }
   };
 
