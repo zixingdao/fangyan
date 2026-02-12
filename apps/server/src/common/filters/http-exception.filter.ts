@@ -24,14 +24,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getResponse()
         : { message: 'Internal server error' };
 
-    const message =
+    let message =
       typeof exceptionResponse === 'object' && 'message' in exceptionResponse
         ? (exceptionResponse as any).message
         : exceptionResponse;
 
     // Handle Zod Validation Errors (nestjs-zod throws UnprocessableEntityException with a specific format)
-    // But typically it's an HttpException.
-    
+    // Extract detailed errors if available
+    if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      // Check for 'errors' field which typically contains Zod issues
+      if ('errors' in exceptionResponse) {
+        const errors = (exceptionResponse as any).errors;
+        if (Array.isArray(errors)) {
+           // Format Zod errors: "path: message"
+           const details = errors.map((e: any) => {
+             const path = e.path ? e.path.join('.') : '';
+             return path ? `${path}: ${e.message}` : e.message;
+           }).join('; ');
+           message = `${message} (${details})`;
+        }
+      }
+    }
+
     // Log error if internal
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
       console.error(exception);
