@@ -2,9 +2,11 @@ import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '@changsha/ui'; // 使用共享组件
 import { LoginDto } from '@changsha/shared';
+import { useNavigate } from 'react-router-dom';
 
 export const LoginForm: React.FC = () => {
   const { login, loading, error } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = React.useState<LoginDto>({
     student_id: '',
     password: '',
@@ -14,7 +16,8 @@ export const LoginForm: React.FC = () => {
     e.preventDefault();
     try {
       await login(formData);
-      alert('登录成功！');
+      // 登录成功后直接跳转首页，不区分角色
+      navigate('/');
     } catch (e) {
       // 错误已由 hook 处理
     }

@@ -190,6 +190,63 @@ export class AdminService {
     return { success: true };
   }
 
+  // 删除用户 (仅超级管理员)
+  async deleteUser(userId: number, adminId: number) {
+    // 检查操作者权限
+    const admin = await this.usersRepository.findOne({ where: { id: adminId } });
+    if (!admin || admin.role !== UserRole.SUPER_ADMIN) {
+      throw new BadRequestException('只有超级管理员可以删除用户');
+    }
+
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('用户不存在');
+    }
+    
+    // 防止删除自己
+    if (user.id === adminId) {
+      throw new BadRequestException('不能删除自己');
+    }
+
+    // 级联删除相关数据（录音、日志等通常由数据库外键处理，或者这里手动处理）
+    // 这里采用软删除或物理删除？根据需求“直接删除”，假设是物理删除。
+    // 为了安全，先删除录音记录
+    await this.recordingsRepository.delete({ user_id: userId });
+    await this.usersRepository.delete(userId);
+
+    await this.logsService.create(
+      adminId,
+      '删除用户',
+      LogType.SYSTEM,
+      LogLevel.WARN,
+      JSON.stringify({ deletedUserId: userId, student_id: user.student_id, name: user.name })
+    );
+
+    return { success: true };
+  }
+
+  // 重置用户密码 (仅超级管理员)
+  async resetUserPassword(userId: number, newPassword: string, adminId: number) {
+    // 检查操作者权限
+    const admin = await this.usersRepository.findOne({ where: { id: adminId } });
+    if (!admin || admin.role !== UserRole.SUPER_ADMIN) {
+      throw new BadRequestException('只有超级管理员可以重置密码');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.usersRepository.update(userId, { password: hashedPassword });
+
+    await this.logsService.create(
+      adminId,
+      '重置密码',
+      LogType.SYSTEM,
+      LogLevel.WARN,
+      JSON.stringify({ userId })
+    );
+
+    return { success: true };
+  }
+
   // 审核录音
   async auditRecording(recordingId: number, status: RecordStatus, remark?: string, adminId?: number) {
     const recording = await this.recordingsRepository.findOne({ where: { id: recordingId }, relations: ['user'] });

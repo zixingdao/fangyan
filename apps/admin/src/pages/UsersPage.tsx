@@ -79,6 +79,40 @@ export const UsersPage = () => {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!currentUser) return;
+    if (!confirm(`确定要删除用户 "${currentUser.name}" 吗？此操作不可恢复！`)) return;
+
+    try {
+      await api.post(`/admin/users/${currentUser.id}/delete`);
+      alert('用户已删除');
+      setIsEditing(false);
+      setCurrentUser(null);
+      fetchUsers();
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || '删除失败');
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!currentUser) return;
+    const newPassword = prompt(`请输入用户 "${currentUser.name}" 的新密码（至少6位）:`);
+    if (newPassword === null) return; // 用户取消
+    if (newPassword.length < 6) {
+      alert('密码长度至少6位');
+      return;
+    }
+
+    try {
+      await api.post(`/admin/users/${currentUser.id}/reset-password`, { password: newPassword });
+      alert('密码已重置');
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || '重置失败');
+    }
+  };
+
   const openEdit = (user: any) => {
     setCurrentUser({ ...user });
     setIsEditing(true);
@@ -462,16 +496,35 @@ export const UsersPage = () => {
               </div>
 
               <div className="flex gap-3 mt-6">
+                {currentUserProfile?.role === UserRole.SUPER_ADMIN && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleDeleteUser}
+                      className="px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-colors"
+                    >
+                      删除账号
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResetPassword}
+                      className="px-4 py-2 bg-yellow-50 text-yellow-600 rounded-xl font-bold hover:bg-yellow-100 transition-colors"
+                    >
+                      重置密码
+                    </button>
+                  </>
+                )}
+                <div className="flex-1"></div>
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                  className="px-6 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
+                  className="px-6 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
                 >
                   保存
                 </button>

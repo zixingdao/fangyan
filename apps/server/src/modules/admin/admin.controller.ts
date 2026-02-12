@@ -21,6 +21,19 @@ export class AdminController {
     return this.adminService.updateUser(+id, body);
   }
 
+  @Post('users/:id/reset-password')
+  resetPassword(@Param('id') id: string, @Body('password') password: string, @Request() req) {
+    if (!password || password.length < 6) {
+      throw new Error('密码至少6位');
+    }
+    return this.adminService.resetUserPassword(+id, password, req.user.id);
+  }
+
+  @Post('users/:id/delete')
+  deleteUser(@Param('id') id: string, @Request() req) {
+    return this.adminService.deleteUser(+id, req.user.id);
+  }
+
   @Post('users')
   createUser(@Body() dto: AdminCreateUserDto, @Request() req) {
     return this.adminService.createUser(dto, req.user.id);
