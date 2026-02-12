@@ -69,22 +69,40 @@ export class AdminService {
   async createUser(dto: AdminCreateUserDto, adminId: number) {
     console.log('Creating user with DTO:', JSON.stringify(dto, null, 2));
     
-    const existed = await this.usersRepository.findOne({ where: { student_id: dto.student_id } });
-    if (existed) {
-      console.warn(`Create user failed: student_id ${dto.student_id} already exists`);
-      throw new BadRequestException('学号已存在');
-    }
-
-    // 检查权限：只有 SUPER_ADMIN 可以创建 ADMIN 或 SUPER_ADMIN
-    if (dto.role === UserRole.ADMIN || dto.role === UserRole.SUPER_ADMIN) {
-      const currentAdmin = await this.usersRepository.findOne({ where: { id: adminId } });
-      if (!currentAdmin || currentAdmin.role !== UserRole.SUPER_ADMIN) {
-        console.warn(`Create user failed: Admin ${adminId} tried to create admin/super_admin but is not super_admin`);
-        throw new BadRequestException('只有超级管理员可以创建管理员账号');
-      }
-    }
-
     try {
+      const whereConditions: any[] = [];
+      if (dto.student_id) whereConditions.push({ student_id: dto.student_id });
+      if (dto.phone) whereConditions.push({ phone: dto.phone });
+
+      if (whereConditions.length > 0) {
+        const existed = await this.usersRepository.findOne({ 
+          where: whereConditions
+        });
+        
+        if (existed) {
+          if (dto.student_id && existed.student_id === dto.student_id) {
+            console.warn(`Create user failed: student_id ${dto.student_id} already exists`);
+            throw new BadRequestException('学号已存在');
+          }
+          if (dto.phone && existed.phone === dto.phone) {
+            console.warn(`Create user failed: phone ${dto.phone} already exists`);
+            throw new BadRequestException('手机号已存在');
+          }
+          // Fallback if matched but neither matches exactly (should not happen with OR query logic above)
+          console.warn(`Create user failed: User conflict found but details unclear. Existed: ${existed.student_id}, Input: ${dto.student_id}`);
+          throw new BadRequestException('用户已存在（学号或手机号重复）');
+        }
+      }
+
+      // 检查权限：只有 SUPER_ADMIN 可以创建 ADMIN 或 SUPER_ADMIN
+      if (dto.role === UserRole.ADMIN || dto.role === UserRole.SUPER_ADMIN) {
+        const currentAdmin = await this.usersRepository.findOne({ where: { id: adminId } });
+        if (!currentAdmin || currentAdmin.role !== UserRole.SUPER_ADMIN) {
+          console.warn(`Create user failed: Admin ${adminId} tried to create admin/super_admin but is not super_admin`);
+          throw new BadRequestException('只有超级管理员可以创建管理员账号');
+        }
+      }
+  
       const hashedPassword = await bcrypt.hash(dto.password, 10);
       const user = this.usersRepository.create({
         student_id: dto.student_id,
@@ -97,7 +115,7 @@ export class AdminService {
         status: dto.status ?? UserStatus.PENDING,
       });
       const saved = await this.usersRepository.save(user);
-
+  
       await this.logsService.create(
         adminId || null,
         '创建用户',
@@ -105,12 +123,15 @@ export class AdminService {
         LogLevel.INFO,
         JSON.stringify({ userId: saved.id, student_id: saved.student_id, role: saved.role, status: saved.status }),
       );
-
+  
       const { password, ...safe } = saved as any;
       return safe;
     } catch (error) {
-      console.error('Error saving user to database:', error);
-      throw error;
+      console.error('Error in createUser:', error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new Error(`创建用户失败: ${error.message}`);
     }
   }
 
