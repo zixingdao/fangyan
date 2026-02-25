@@ -10,7 +10,18 @@ import type { NextFunction, Request, Response } from 'express';
 import { join } from 'path';
 
 async function bootstrap() {
+  console.log('=== Starting Bootstrap ===');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('PORT:', process.env.PORT);
+  console.log('DB_TYPE:', process.env.DB_TYPE);
+  console.log('DB_HOST:', process.env.DB_HOST);
+  console.log('DB_PORT:', process.env.DB_PORT);
+  console.log('DB_USER:', process.env.DB_USER);
+  console.log('DB_NAME:', process.env.DB_NAME);
+  console.log('========================');
+  
   const app = await NestFactory.create(AppModule);
+  console.log('App created successfully');
 
   // Security: Helmet
   app.use(helmet({
@@ -83,6 +94,7 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT || 80;
+  console.log(`Starting to listen on port ${port}...`);
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: ${await app.getUrl()}`);
   console.log(`Swagger documentation is available at: ${await app.getUrl()}/docs`);
