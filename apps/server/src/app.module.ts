@@ -75,15 +75,15 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
         },
       },
     ),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        ...configService.get('database'),
-        entities: [User, Recording, Ranking, Topic, Log, SystemConfig], // 注册所有实体
-        autoLoadEntities: true,
-      }),
-      inject: [ConfigService],
-    }),
+    // TypeOrmModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: (configService: ConfigService) => ({
+    //     ...configService.get('database'),
+    //     entities: [User, Recording, Ranking, Topic, Log, SystemConfig], // 注册所有实体
+    //     autoLoadEntities: true,
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     UsersModule,
     AuthModule,
     RecordingsModule,
