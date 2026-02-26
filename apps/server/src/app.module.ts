@@ -21,9 +21,6 @@ import { Ranking } from './modules/rankings/ranking.entity';
 import { Topic } from './modules/topics/topic.entity';
 import { Log } from './modules/logs/log.entity';
 import { SystemConfig } from './modules/system/system-config.entity';
-import { PageConfigsModule } from './modules/page-configs/page-configs.module';
-import { PageConfig } from './modules/page-configs/page-config.entity';
-import { UploadModule } from './modules/upload/upload.module';
 import { RequestCounterMiddleware } from './request-counter.middleware';
 
 @Module({
@@ -84,7 +81,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         ...configService.get('database'),
-        entities: [User, Recording, Ranking, Topic, Log, SystemConfig, PageConfig], // 注册所有实体
+        entities: [User, Recording, Ranking, Topic, Log, SystemConfig], // 注册所有实体
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
@@ -93,12 +90,12 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       {
         name: 'short',
         ttl: 60000, // 1分钟
-        limit: 5,   // 每IP每端点5次请求
+        limit: 15,   // 每IP每端点5次请求
       },
       {
         name: 'long',
         ttl: 3600000, // 1小时
-        limit: 100,   // 每IP每小时100次请求
+        limit: 200,   // 每IP每小时100次请求
       },
     ]),
     UsersModule,
@@ -110,8 +107,6 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
     LogsModule,
     SystemModule,
     MonitorModule,
-    PageConfigsModule,
-    UploadModule,
   ],
   controllers: [],
   providers: [

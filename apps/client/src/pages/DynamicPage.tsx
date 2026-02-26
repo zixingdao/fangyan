@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/axios';
-import { ArrowLeft, Loader2, User, Lock, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Loader2, User, Lock, RefreshCw, Timer } from 'lucide-react';
 
 interface ComponentProps {
   text?: string;
@@ -60,13 +60,27 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
       }
     } catch (err: any) {
       console.error('Failed to fetch page config:', err);
+
+      // 如果是 429 限流错误，延迟后自动重试
+      if (err.isRateLimit && retryCount < 3) {
+        console.log(`Rate limited, retrying in ${(retryCount + 1) * 2}s... (${retryCount + 1}/3)`);
+        setTimeout(() => fetchPageConfig(retryCount + 1), 2000 * (retryCount + 1));
+        return;
+      }
+
       // 如果是网络错误或超时，且重试次数小于3次，则自动重试
       if (retryCount < 3 && (!err.response || err.code === 'ECONNABORTED' || err.code === 'ERR_NETWORK')) {
         console.log(`Retrying fetch page config... (${retryCount + 1}/3)`);
         setTimeout(() => fetchPageConfig(retryCount + 1), 1000 * (retryCount + 1));
         return;
       }
-      setError('加载页面配置失败，请稍后重试');
+
+      // 显示友好的错误信息
+      if (err.isRateLimit) {
+        setError('请求过于频繁，请稍后再试');
+      } else {
+        setError('加载页面配置失败，请稍后重试');
+      }
     } finally {
       setLoading(false);
     }
@@ -127,6 +141,7 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
   }
 
   if (error || !config || !config.isActive) {
+    const isRateLimitError = error?.includes('过于频繁');
     return (
       <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
         <div className="container mx-auto px-4 py-8">
@@ -138,7 +153,17 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
             返回
           </button>
           <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-            <p className="text-gray-500 mb-4">{error || '页面配置不存在或未启用'}</p>
+            {isRateLimitError ? (
+              <div className="flex flex-col items-center gap-3 mb-4">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
+                  <Timer className="w-8 h-8 text-orange-500" />
+                </div>
+                <p className="text-orange-600 font-medium">{error}</p>
+                <p className="text-sm text-gray-400">系统正在自动重试，请稍候...</p>
+              </div>
+            ) : (
+              <p className="text-gray-500 mb-4">{error || '页面配置不存在或未启用'}</p>
+            )}
             {error && (
               <button
                 onClick={() => fetchPageConfig()}
