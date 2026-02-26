@@ -432,14 +432,6 @@ export const PageConfigsPage = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-red-600" />
-      </div>
-    );
-  }
-
   const isSuperAdmin = userRole === 'super_admin';
 
   // 初始化云开发并匿名登录
@@ -517,6 +509,15 @@ export const PageConfigsPage = () => {
       setUploadingId(null);
     }
   };
+
+  // 注意：所有 hooks 必须在这个 return 之前调用
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-red-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
