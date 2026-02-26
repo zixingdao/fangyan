@@ -55,11 +55,11 @@ export class UploadService {
       return fileID;
     } catch (error) {
       console.error('上传到云存储失败:', error);
-      // 如果云存储上传失败，回退到 Base64
-      console.log('回退到 Base64 存储');
-      const base64 = file.buffer.toString('base64');
-      const mimeType = file.mimetype;
-      return `data:${mimeType};base64,${base64}`;
+      // 上传失败直接抛出错误，不回退到 Base64（避免数据库字段过大）
+      throw new HttpException(
+        `上传到云存储失败: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
