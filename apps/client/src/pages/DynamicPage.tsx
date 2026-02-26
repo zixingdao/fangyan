@@ -58,6 +58,7 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
       } else {
         setConfig(data);
       }
+      setLoading(false);
     } catch (err: any) {
       console.error('Failed to fetch page config:', err);
 
