@@ -39,10 +39,16 @@ export class PageConfigsService {
       where: { pageType: dto.pageType },
     });
 
+    // 确保每个组件都有 props
+    const components = dto.components.map(c => ({
+      ...c,
+      props: c.props || {},
+    }));
+
     if (existing) {
       // Update existing
       existing.title = dto.title;
-      existing.setComponents(dto.components);
+      existing.setComponents(components as any);
       if (dto.isActive !== undefined) {
         existing.isActive = dto.isActive;
       }
@@ -53,7 +59,7 @@ export class PageConfigsService {
     const config = new PageConfig();
     config.pageType = dto.pageType;
     config.title = dto.title;
-    config.setComponents(dto.components);
+    config.setComponents(components as any);
     config.isActive = dto.isActive ?? true;
 
     return this.pageConfigRepository.save(config);
@@ -66,7 +72,12 @@ export class PageConfigsService {
       config.title = dto.title;
     }
     if (dto.components !== undefined) {
-      config.setComponents(dto.components);
+      // 确保每个组件都有 props
+      const components = dto.components.map(c => ({
+        ...c,
+        props: c.props || {},
+      }));
+      config.setComponents(components as any);
     }
     if (dto.isActive !== undefined) {
       config.isActive = dto.isActive;

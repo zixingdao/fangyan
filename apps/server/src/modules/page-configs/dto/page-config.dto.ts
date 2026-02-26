@@ -16,7 +16,8 @@ export class PageComponentDto {
   @IsNumber()
   order: number;
 
-  props: Record<string, any>;
+  @IsOptional()
+  props?: Record<string, any>;
 }
 
 export class CreatePageConfigDto {
