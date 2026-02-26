@@ -3,7 +3,7 @@ import { api } from '../lib/axios';
 import { 
   Save, Loader2, Plus, Trash2, GripVertical, Image, Type, 
   QrCode, Heading, MousePointer2, Minus, ArrowUp, ArrowDown,
-  LayoutTemplate, AlertCircle
+  LayoutTemplate, AlertCircle, Crown
 } from 'lucide-react';
 
 interface ComponentProps {
@@ -383,10 +383,15 @@ export const PageConfigsPage = () => {
           页面配置管理
         </h1>
         <div className="flex items-center gap-3">
-          {!isSuperAdmin && (
+          {isSuperAdmin ? (
+            <span className="text-sm text-purple-600 flex items-center gap-1.5 bg-purple-50 px-4 py-2 rounded-lg border border-purple-100">
+              <Crown className="w-4 h-4" />
+              尊敬的超级管理员，请开始编辑吧
+            </span>
+          ) : (
             <span className="text-sm text-orange-600 flex items-center gap-1 bg-orange-50 px-3 py-1.5 rounded-lg">
               <AlertCircle className="w-4 h-4" />
-              仅超级管理员可编辑
+              当前您是普通管理员，无法配置界面
             </span>
           )}
           <button
