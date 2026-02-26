@@ -440,15 +440,30 @@ export const PageConfigsPage = () => {
 
   const isSuperAdmin = userRole === 'super_admin';
   const cloudbaseApp = useRef<any>(null);
+  const [cloudbaseReady, setCloudbaseReady] = useState(false);
 
-  // 初始化云开发
+  // 初始化云开发并匿名登录
   useEffect(() => {
-    if (!cloudbaseApp.current) {
-      cloudbaseApp.current = cloudbase.init({
-        env: 'cloud1-8gl0blge9ea5f0ca',
-        region: 'ap-shanghai',
-      });
-    }
+    const initCloudbase = async () => {
+      if (!cloudbaseApp.current) {
+        cloudbaseApp.current = cloudbase.init({
+          env: 'cloud1-8gl0blge9ea5f0ca',
+          region: 'ap-shanghai',
+        });
+        
+        try {
+          // 匿名登录
+          const auth = cloudbaseApp.current.auth();
+          await auth.signInAnonymously();
+          console.log('云开发匿名登录成功');
+          setCloudbaseReady(true);
+        } catch (error) {
+          console.error('云开发登录失败:', error);
+        }
+      }
+    };
+    
+    initCloudbase();
   }, []);
 
   // 处理图片上传 - 前端直传到云存储
@@ -466,6 +481,12 @@ export const PageConfigsPage = () => {
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
       alert('图片大小不能超过 2MB');
+      return;
+    }
+
+    // 检查是否已登录云开发
+    if (!cloudbaseReady) {
+      alert('云存储服务初始化中，请稍后重试');
       return;
     }
 
