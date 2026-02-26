@@ -37,7 +37,7 @@ export class PageConfig {
   @Column({ type: 'varchar', length: 100 })
   title: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'longtext' })
   components: string;  // JSON string of PageComponent[]
 
   @Column({ default: true })

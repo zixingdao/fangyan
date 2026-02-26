@@ -4,12 +4,11 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UploadService {
   private readonly envId = 'cloud1-8gl0blge9ea5f0ca';
-  private readonly region = 'ap-shanghai';
-  private readonly cloudToken: string;
+  private readonly apiKey: string;
 
   constructor(private configService: ConfigService) {
-    // 从环境变量读取云存储访问令牌
-    this.cloudToken = this.configService.get<string>('TENCENT_CLOUD_TOKEN') || '';
+    // 从环境变量读取 API Key
+    this.apiKey = this.configService.get<string>('TENCENT_CLOUD_TOKEN') || '';
   }
 
   /**
@@ -34,9 +33,9 @@ export class UploadService {
       throw new HttpException('图片大小不能超过 2MB', HttpStatus.BAD_REQUEST);
     }
 
-    // 如果没有配置 Token，使用 Base64 存储
-    if (!this.cloudToken) {
-      console.log('未配置云存储 Token，使用 Base64 存储');
+    // 如果没有配置 API Key，使用 Base64 存储
+    if (!this.apiKey) {
+      console.log('未配置云存储 API Key，使用 Base64 存储');
       const base64 = file.buffer.toString('base64');
       const mimeType = file.mimetype;
       return `data:${mimeType};base64,${base64}`;
@@ -50,10 +49,10 @@ export class UploadService {
       const cloudPath = `page-images/${timestamp}-${randomStr}.${ext}`;
 
       // 调用云开发 HTTP API 上传
-      const url = await this.uploadToCloudStorage(file, cloudPath);
+      const fileID = await this.uploadToCloudBase(file, cloudPath);
 
       // 返回图片访问URL
-      return url;
+      return fileID;
     } catch (error) {
       console.error('上传到云存储失败:', error);
       // 如果云存储上传失败，回退到 Base64
@@ -65,61 +64,50 @@ export class UploadService {
   }
 
   /**
-   * 上传到腾讯云云存储
+   * 上传到腾讯云云开发云存储
    */
-  private async uploadToCloudStorage(
+  private async uploadToCloudBase(
     file: Express.Multer.File,
     cloudPath: string,
   ): Promise<string> {
-    // 使用云存储直传方式
-    // 1. 获取上传凭证
-    const uploadMetadataUrl = `https://${this.envId}.api.tcloudbasegateway.com/v1/env/upload-file`;
+    // 使用云开发 HTTP API 上传文件
+    // 参考文档: https://docs.cloudbase.net/api-reference/server/server-api.html
     
-    const metadataResponse = await fetch(uploadMetadataUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.cloudToken}`,
-      },
-      body: JSON.stringify({
-        path: cloudPath,
-      }),
-    });
-
-    if (!metadataResponse.ok) {
-      throw new Error('获取上传凭证失败');
-    }
-
-    const metadata = await metadataResponse.json();
+    const url = `https://tcb-api.tencentcloudapi.com/api/v1/env/${this.envId}/storage/upload`;
     
-    if (metadata.code !== 'SUCCESS') {
-      throw new Error(metadata.message || '获取上传凭证失败');
-    }
-
-    const { url, authorization, token, cosFileId } = metadata.data;
-
-    // 2. 上传到 COS
+    // 创建 FormData
     const formData = new FormData();
-    formData.append('key', cloudPath);
-    formData.append('Signature', authorization);
-    formData.append('x-cos-security-token', token);
-    formData.append('x-cos-meta-fileid', cosFileId);
+    formData.append('path', cloudPath);
     
-    // 将 Buffer 转换为 Uint8Array 再转为 Blob
+    // 将 Buffer 转为 Uint8Array 再转为 Blob
     const uint8Array = new Uint8Array(file.buffer);
     const blob = new Blob([uint8Array], { type: file.mimetype });
     formData.append('file', blob, file.originalname);
 
-    const uploadResponse = await fetch(url, {
+    const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        'Authorization': `ApiKey ${this.apiKey}`,
+      },
       body: formData,
     });
 
-    if (!uploadResponse.ok) {
-      throw new Error(`上传失败: ${uploadResponse.statusText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('上传文件失败:', errorText);
+      throw new Error(`上传失败: ${response.status}`);
     }
 
-    // 3. 返回访问 URL
-    return `https://${this.envId}.tcb.qcloud.la/${cloudPath}`;
+    const result = await response.json();
+    
+    if (result.code !== 'SUCCESS' && result.code !== 0 && result.code !== 'OK') {
+      console.error('上传文件失败:', result);
+      throw new Error(result.message || '上传失败');
+    }
+
+    // 返回文件访问 URL
+    // 云存储文件ID格式: cloud://envId.fileId
+    // 访问URL格式: https://envId.tcb.qcloud.la/path
+    return `https://636c-cloud1-8gl0blge9ea5f0ca-1333174272.tcb.qcloud.la/${cloudPath}`;
   }
 }
