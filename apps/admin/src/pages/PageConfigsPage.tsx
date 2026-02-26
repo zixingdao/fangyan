@@ -125,22 +125,37 @@ export const PageConfigsPage = () => {
 
   const addComponent = (type: PageComponent['type']) => {
     const currentConfig = configs[activeTab];
-    if (!currentConfig) return;
 
     const newComponent: PageComponent = {
       id: `comp-${Date.now()}`,
       type,
-      order: currentConfig.components.length + 1,
+      order: currentConfig ? currentConfig.components.length + 1 : 1,
       props: { ...DEFAULT_PROPS[type] },
     };
 
-    setConfigs({
-      ...configs,
-      [activeTab]: {
-        ...currentConfig,
-        components: [...currentConfig.components, newComponent],
-      },
-    });
+    if (currentConfig) {
+      // 已有配置，添加组件
+      setConfigs({
+        ...configs,
+        [activeTab]: {
+          ...currentConfig,
+          components: [...currentConfig.components, newComponent],
+        },
+      });
+    } else {
+      // 没有配置，创建新配置
+      const newConfig: PageConfig = {
+        id: 0, // 新配置，id 为 0
+        pageType: activeTab,
+        title: PAGE_TYPE_LABELS[activeTab],
+        components: [newComponent],
+        isActive: true,
+      };
+      setConfigs({
+        ...configs,
+        [activeTab]: newConfig,
+      });
+    }
   };
 
   const removeComponent = (componentId: string) => {
