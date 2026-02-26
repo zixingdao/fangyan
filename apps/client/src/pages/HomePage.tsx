@@ -62,7 +62,7 @@ export const HomePage = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 mb-8 md:mb-12">
-            <Link to="/upload" className="px-8 md:px-10 py-3 md:py-4 bg-red-600 text-white font-bold text-base md:text-lg rounded-full hover:bg-red-700 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-3">
+            <Link to="/join-guardian" className="px-8 md:px-10 py-3 md:py-4 bg-red-600 text-white font-bold text-base md:text-lg rounded-full hover:bg-red-700 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-3">
               <Mic size={20} className="md:w-6 md:h-6" />
               加入守护
             </Link>

@@ -20,13 +20,7 @@ export class AuthService {
     }
 
     const stored = user.password;
-    const isBcryptHash = /^\$2[aby]\$\d{2}\$/.test(stored);
-    const ok = isBcryptHash ? await bcrypt.compare(pass, stored) : stored === pass;
-
-    if (ok && !isBcryptHash) {
-      const hashedPassword = await bcrypt.hash(pass, 10);
-      await this.usersService.updatePasswordHash(user.id, hashedPassword);
-    }
+    const ok = await bcrypt.compare(pass, stored);
 
     if (ok) {
       const { password, ...result } = user;

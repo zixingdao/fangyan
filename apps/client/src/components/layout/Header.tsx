@@ -54,8 +54,8 @@ export const Header = () => {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Link to="/login" className="text-gray-600 hover:text-primary font-medium">登录</Link>
-              <Link to="/register" className="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors shadow-md hover:shadow-lg">
+              <Link to="/login-info" className="text-gray-600 hover:text-primary font-medium">登录</Link>
+              <Link to="/join-plan" className="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors shadow-md hover:shadow-lg">
                 加入计划
               </Link>
             </div>
@@ -91,8 +91,8 @@ export const Header = () => {
             </>
           ) : (
             <div className="flex flex-col gap-3 mt-2">
-              <Link to="/login" className="w-full text-center py-2 border border-gray-200 rounded-lg text-gray-600">登录</Link>
-              <Link to="/register" className="w-full text-center py-2 bg-primary text-white rounded-lg">加入计划</Link>
+              <Link to="/login-info" className="w-full text-center py-2 border border-gray-200 rounded-lg text-gray-600">登录</Link>
+              <Link to="/join-plan" className="w-full text-center py-2 bg-primary text-white rounded-lg">加入计划</Link>
             </div>
           )}
         </div>

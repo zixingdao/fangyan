@@ -3,6 +3,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import configuration from './config/configuration';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -19,6 +21,8 @@ import { Ranking } from './modules/rankings/ranking.entity';
 import { Topic } from './modules/topics/topic.entity';
 import { Log } from './modules/logs/log.entity';
 import { SystemConfig } from './modules/system/system-config.entity';
+import { PageConfigsModule } from './modules/page-configs/page-configs.module';
+import { PageConfig } from './modules/page-configs/page-config.entity';
 import { RequestCounterMiddleware } from './request-counter.middleware';
 
 @Module({
@@ -79,11 +83,23 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         ...configService.get('database'),
-        entities: [User, Recording, Ranking, Topic, Log, SystemConfig], // 注册所有实体
+        entities: [User, Recording, Ranking, Topic, Log, SystemConfig, PageConfig], // 注册所有实体
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 60000, // 1分钟
+        limit: 5,   // 每IP每端点5次请求
+      },
+      {
+        name: 'long',
+        ttl: 3600000, // 1小时
+        limit: 100,   // 每IP每小时100次请求
+      },
+    ]),
     UsersModule,
     AuthModule,
     RecordingsModule,
@@ -93,9 +109,15 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
     LogsModule,
     SystemModule,
     MonitorModule,
+    PageConfigsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

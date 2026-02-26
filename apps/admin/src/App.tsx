@@ -9,6 +9,7 @@ import { TopicsPage } from './pages/TopicsPage';
 import { RecordingsPage } from './pages/RecordingsPage';
 import { LogsPage } from './pages/LogsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { PageConfigsPage } from './pages/PageConfigsPage';
 import { UserRole } from '@changsha/shared';
 
 import { SystemTestPage } from './pages/SystemTestPage';
@@ -87,6 +88,7 @@ function App() {
             <Route path="logs" element={<LogsPage />} />
             <Route path="test" element={<SystemTestPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="page-configs" element={<PageConfigsPage />} />
           </Route>
         </Routes>
       </HashRouter>

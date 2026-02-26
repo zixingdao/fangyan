@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   Settings,
-  Activity
+  Activity,
+  LayoutTemplate
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -34,6 +35,7 @@ export const Layout = () => {
     { label: '系统日志', path: '/logs', icon: FileText },
     { label: '压力测试', path: '/test', icon: Activity },
     { label: '系统设置', path: '/settings', icon: Settings },
+    { label: '页面配置', path: '/page-configs', icon: LayoutTemplate },
   ];
 
   return (

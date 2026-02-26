@@ -8,6 +8,7 @@ import { RankingPage } from './pages/RankingPage';
 import { UploadPage } from './pages/UploadPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { GuidePage } from './pages/GuidePage';
+import { DynamicPage } from './pages/DynamicPage';
 
 // 简单的错误边界组件
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -61,6 +62,11 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/ranking" element={<RankingPage />} />
           <Route path="/guide" element={<GuidePage />} />
+          
+          {/* Dynamic Pages */}
+          <Route path="/join-guardian" element={<DynamicPage pageType="join_guardian" />} />
+          <Route path="/join-plan" element={<DynamicPage pageType="join_plan" />} />
+          <Route path="/login-info" element={<DynamicPage pageType="login" />} />
           
           <Route
             path="/upload"
