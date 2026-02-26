@@ -3,7 +3,7 @@ import { api } from '../lib/axios';
 import { 
   Save, Loader2, Plus, Trash2, GripVertical, Image, Type, 
   QrCode, Heading, MousePointer2, Minus, ArrowUp, ArrowDown,
-  LayoutTemplate, AlertCircle, Crown, Upload
+  LayoutTemplate, AlertCircle, Crown, Upload, LogIn
 } from 'lucide-react';
 
 interface ComponentProps {
@@ -20,7 +20,7 @@ interface ComponentProps {
 
 interface PageComponent {
   id: string;
-  type: 'text' | 'image' | 'qr_code' | 'title' | 'button' | 'divider';
+  type: 'text' | 'image' | 'qr_code' | 'title' | 'button' | 'divider' | 'login_form';
   order: number;
   props: ComponentProps;
 }
@@ -46,6 +46,7 @@ const COMPONENT_TYPE_LABELS: Record<string, { label: string; icon: React.ReactNo
   qr_code: { label: '二维码', icon: <QrCode className="w-4 h-4" /> },
   button: { label: '按钮', icon: <MousePointer2 className="w-4 h-4" /> },
   divider: { label: '分隔线', icon: <Minus className="w-4 h-4" /> },
+  login_form: { label: '登录界面', icon: <LogIn className="w-4 h-4" /> },
 };
 
 const DEFAULT_PROPS: Record<string, ComponentProps> = {
@@ -55,6 +56,7 @@ const DEFAULT_PROPS: Record<string, ComponentProps> = {
   qr_code: { imageUrl: '', description: '扫描二维码', width: 200, align: 'center' },
   button: { text: '点击按钮', url: '#', variant: 'primary', align: 'center' },
   divider: {},
+  login_form: { text: '登录', align: 'center' },
 };
 
 export const PageConfigsPage = () => {
@@ -280,10 +282,10 @@ export const PageConfigsPage = () => {
           )}
 
           {/* Title & Text props */}
-          {(type === 'title' || type === 'text' || type === 'button') && (
+          {(type === 'title' || type === 'text' || type === 'button' || type === 'login_form') && (
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                {type === 'button' ? '按钮文字' : '文本内容'}
+                {type === 'button' ? '按钮文字' : type === 'login_form' ? '登录按钮文字' : '文本内容'}
               </label>
               {type === 'text' ? (
                 <textarea
@@ -648,6 +650,37 @@ export const PageConfigsPage = () => {
                         );
                       case 'divider':
                         return <hr key={component.id} className="border-gray-200" />;
+                      case 'login_form':
+                        return (
+                          <div key={component.id} className={`${alignClass} p-4 bg-gray-50 rounded-lg border border-gray-200`}>
+                            <div className="space-y-3 max-w-xs mx-auto">
+                              <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">账号</label>
+                                <input
+                                  type="text"
+                                  disabled
+                                  placeholder="请输入学号"
+                                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-100"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">密码</label>
+                                <input
+                                  type="password"
+                                  disabled
+                                  placeholder="请输入密码"
+                                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-100"
+                                />
+                              </div>
+                              <button
+                                disabled
+                                className="w-full py-2 bg-red-600 text-white text-sm rounded-lg opacity-50"
+                              >
+                                {props.text || '登录'}
+                              </button>
+                            </div>
+                          </div>
+                        );
                       default:
                         return null;
                     }

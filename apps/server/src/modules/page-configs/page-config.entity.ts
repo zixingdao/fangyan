@@ -13,6 +13,7 @@ export enum ComponentType {
   TITLE = 'title',         // 标题
   BUTTON = 'button',       // 按钮
   DIVIDER = 'divider',     // 分隔线
+  LOGIN_FORM = 'login_form', // 登录表单
 }
 
 export interface PageComponent {
