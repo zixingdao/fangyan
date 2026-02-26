@@ -13,8 +13,11 @@ export class UploadService {
 
   constructor(private configService: ConfigService) {
     // 从环境变量读取腾讯云 API 密钥
-    this.secretId = this.configService.get<string>('TENCENT_SECRET_ID') || '';
-    this.secretKey = this.configService.get<string>('TENCENT_SECRET_KEY') || '';
+    // 支持两种变量名：SecretId/SecretKey 或 TENCENT_SECRET_ID/TENCENT_SECRET_KEY
+    this.secretId = this.configService.get<string>('SecretId') || 
+                    this.configService.get<string>('TENCENT_SECRET_ID') || '';
+    this.secretKey = this.configService.get<string>('SecretKey') || 
+                     this.configService.get<string>('TENCENT_SECRET_KEY') || '';
 
     // 初始化云开发
     if (this.secretId && this.secretKey) {
@@ -48,12 +51,12 @@ export class UploadService {
       throw new HttpException('图片大小不能超过 2MB', HttpStatus.BAD_REQUEST);
     }
 
-    // 如果没有配置密钥，使用 Base64 存储
+    // 如果没有配置密钥，报错提示
     if (!this.secretId || !this.secretKey || !this.app) {
-      console.log('未配置腾讯云密钥，使用 Base64 存储');
-      const base64 = file.buffer.toString('base64');
-      const mimeType = file.mimetype;
-      return `data:${mimeType};base64,${base64}`;
+      throw new HttpException(
+        '未配置腾讯云云存储密钥，请在环境变量中设置 TENCENT_SECRET_ID 和 TENCENT_SECRET_KEY',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
 
     try {
