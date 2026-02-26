@@ -66,11 +66,17 @@ export const PageConfigsPage = () => {
 
   useEffect(() => {
     fetchConfigs();
-    // Get user role from localStorage
-    const userStr = localStorage.getItem('admin_user');
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      setUserRole(user.role);
+    // Get user role from localStorage (useAuthStore uses 'admin-auth-storage')
+    const authStr = localStorage.getItem('admin-auth-storage');
+    if (authStr) {
+      try {
+        const auth = JSON.parse(authStr);
+        if (auth.state && auth.state.user) {
+          setUserRole(auth.state.user.role);
+        }
+      } catch (e) {
+        console.error('Failed to parse auth storage:', e);
+      }
     }
   }, []);
 
