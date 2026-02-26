@@ -23,6 +23,7 @@ import { Log } from './modules/logs/log.entity';
 import { SystemConfig } from './modules/system/system-config.entity';
 import { PageConfigsModule } from './modules/page-configs/page-configs.module';
 import { PageConfig } from './modules/page-configs/page-config.entity';
+import { UploadModule } from './modules/upload/upload.module';
 import { RequestCounterMiddleware } from './request-counter.middleware';
 
 @Module({
@@ -110,6 +111,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
     SystemModule,
     MonitorModule,
     PageConfigsModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [

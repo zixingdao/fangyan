@@ -3,7 +3,7 @@ import { api } from '../lib/axios';
 import { 
   Save, Loader2, Plus, Trash2, GripVertical, Image, Type, 
   QrCode, Heading, MousePointer2, Minus, ArrowUp, ArrowDown,
-  LayoutTemplate, AlertCircle, Crown
+  LayoutTemplate, AlertCircle, Crown, Upload
 } from 'lucide-react';
 
 interface ComponentProps {
@@ -63,6 +63,7 @@ export const PageConfigsPage = () => {
   const [activeTab, setActiveTab] = useState<'join_guardian' | 'join_plan' | 'login'>('join_guardian');
   const [configs, setConfigs] = useState<Record<string, PageConfig>>({});
   const [userRole, setUserRole] = useState<string>('');
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchConfigs();
@@ -351,15 +352,57 @@ export const PageConfigsPage = () => {
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
-                  {type === 'qr_code' ? '二维码图片URL' : '图片URL'}
+                  {type === 'qr_code' ? '二维码图片' : '图片'}
                 </label>
-                <input
-                  type="text"
-                  value={props.imageUrl || ''}
-                  onChange={(e) => updateComponent(id, { imageUrl: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={props.imageUrl || ''}
+                    onChange={(e) => updateComponent(id, { imageUrl: e.target.value })}
+                    placeholder="图片URL 或上传图片..."
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none"
+                    disabled={uploadingId === id}
+                  />
+                  <label
+                    className={`flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-lg cursor-pointer transition-colors ${
+                      uploadingId === id || !isSuperAdmin
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'hover:bg-red-100'
+                    }`}
+                  >
+                    {uploadingId === id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
+                    )}
+                    <span className="text-sm font-medium">
+                      {uploadingId === id ? '上传中...' : '上传'}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageUpload(id, file);
+                        e.target.value = ''; // 清空input，允许重复选择同一文件
+                      }}
+                      disabled={uploadingId === id || !isSuperAdmin}
+                    />
+                  </label>
+                </div>
+                {props.imageUrl && (
+                  <div className="mt-2 p-2 bg-gray-50 rounded-lg">
+                    <img
+                      src={props.imageUrl}
+                      alt="预览"
+                      className="max-h-32 max-w-full rounded"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">描述文字</label>
@@ -395,6 +438,50 @@ export const PageConfigsPage = () => {
   }
 
   const isSuperAdmin = userRole === 'super_admin';
+
+  // 处理图片上传
+  const handleImageUpload = async (componentId: string, file: File) => {
+    if (!file) return;
+
+    // 验证文件类型
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('只支持 JPG、PNG、GIF、WEBP 格式的图片');
+      return;
+    }
+
+    // 验证文件大小 (最大 2MB)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('图片大小不能超过 2MB');
+      return;
+    }
+
+    try {
+      setUploadingId(componentId);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response: any = await api.post('/upload/image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.code === 200 && response.data?.url) {
+        updateComponent(componentId, { imageUrl: response.data.url });
+        alert('上传成功');
+      } else {
+        alert('上传失败');
+      }
+    } catch (error) {
+      console.error('上传失败:', error);
+      alert('上传失败，请重试');
+    } finally {
+      setUploadingId(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
