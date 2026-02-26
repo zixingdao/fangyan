@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/axios';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, User, Lock } from 'lucide-react';
 
 interface ComponentProps {
   text?: string;
@@ -17,7 +17,7 @@ interface ComponentProps {
 
 interface PageComponent {
   id: string;
-  type: 'text' | 'image' | 'qr_code' | 'title' | 'button' | 'divider';
+  type: 'text' | 'image' | 'qr_code' | 'title' | 'button' | 'divider' | 'login_form';
   order: number;
   props: ComponentProps;
 }
@@ -39,6 +39,9 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
   const [config, setConfig] = useState<PageConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loginForm, setLoginForm] = useState({ student_id: '', password: '' });
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPageConfig();
@@ -64,7 +67,7 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
 
   const handleButtonClick = (url?: string) => {
     if (!url) return;
-    
+
     if (url.startsWith('#')) {
       // Internal route
       navigate(url.substring(1));
@@ -74,6 +77,33 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
     } else {
       // Default to internal
       navigate(url);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    setLoginError(null);
+
+    try {
+      const response: any = await api.post('/auth/login', loginForm);
+      if (response.code === 200 && response.data) {
+        // 保存登录信息到 localStorage
+        localStorage.setItem('auth-storage', JSON.stringify({
+          state: {
+            user: response.data.user,
+            token: response.data.access_token,
+          },
+        }));
+        // 登录成功，跳转到首页或个人中心
+        navigate('/profile');
+      } else {
+        setLoginError(response.msg || '登录失败');
+      }
+    } catch (err: any) {
+      setLoginError(err.message || '登录失败，请检查账号密码');
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -190,6 +220,55 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
 
       case 'divider':
         return <hr key={component.id} className="my-6 border-gray-200" />;
+
+      case 'login_form':
+        return (
+          <div key={component.id} className={`my-6 ${alignClass}`}>
+            <form onSubmit={handleLogin} className="space-y-4 max-w-sm mx-auto">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">学号</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    value={loginForm.student_id}
+                    onChange={(e) => setLoginForm({ ...loginForm, student_id: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition-all"
+                    placeholder="请输入学号"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition-all"
+                    placeholder="请输入密码"
+                    required
+                  />
+                </div>
+              </div>
+              {loginError && (
+                <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center">
+                  {loginError}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={loginLoading}
+                className="w-full py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-200 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loginLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                {props.text || '登录'}
+              </button>
+            </form>
+          </div>
+        );
 
       default:
         return null;
