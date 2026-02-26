@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { api } from '../lib/axios';
 import { 
   Save, Loader2, Plus, Trash2, GripVertical, Image, Type, 
   QrCode, Heading, MousePointer2, Minus, ArrowUp, ArrowDown,
   LayoutTemplate, AlertCircle, Crown, Upload
 } from 'lucide-react';
+import cloudbase from '@cloudbase/js-sdk';
 
 interface ComponentProps {
   text?: string;
@@ -438,8 +439,19 @@ export const PageConfigsPage = () => {
   }
 
   const isSuperAdmin = userRole === 'super_admin';
+  const cloudbaseApp = useRef<any>(null);
 
-  // 处理图片上传
+  // 初始化云开发
+  useEffect(() => {
+    if (!cloudbaseApp.current) {
+      cloudbaseApp.current = cloudbase.init({
+        env: 'cloud1-8gl0blge9ea5f0ca',
+        region: 'ap-shanghai',
+      });
+    }
+  }, []);
+
+  // 处理图片上传 - 前端直传到云存储
   const handleImageUpload = async (componentId: string, file: File) => {
     if (!file) return;
 
@@ -460,21 +472,23 @@ export const PageConfigsPage = () => {
     try {
       setUploadingId(componentId);
 
-      const formData = new FormData();
-      formData.append('file', file);
+      // 生成文件名
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const ext = file.name.split('.').pop() || 'png';
+      const cloudPath = `page-images/${timestamp}-${randomStr}.${ext}`;
 
-      const response: any = await api.post('/upload/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      // 使用云开发 SDK 上传
+      await cloudbaseApp.current.uploadFile({
+        cloudPath: cloudPath,
+        filePath: file,
       });
 
-      if (response.code === 200 && response.data?.url) {
-        updateComponent(componentId, { imageUrl: response.data.url });
-        alert('上传成功');
-      } else {
-        alert('上传失败');
-      }
+      // 获取文件访问 URL
+      const fileUrl = `https://636c-cloud1-8gl0blge9ea5f0ca-1333174272.tcb.qcloud.la/${cloudPath}`;
+      
+      updateComponent(componentId, { imageUrl: fileUrl });
+      alert('上传成功');
     } catch (error) {
       console.error('上传失败:', error);
       alert('上传失败，请重试');

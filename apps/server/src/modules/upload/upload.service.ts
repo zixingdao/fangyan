@@ -1,14 +1,17 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UploadService {
   private readonly envId = 'cloud1-8gl0blge9ea5f0ca';
-  private readonly apiKey: string;
+  private readonly secretId: string;
+  private readonly secretKey: string;
 
   constructor(private configService: ConfigService) {
-    // 从环境变量读取 API Key
-    this.apiKey = this.configService.get<string>('TENCENT_CLOUD_TOKEN') || '';
+    // 从环境变量读取密钥
+    this.secretId = this.configService.get<string>('TENCENT_SECRET_ID') || '';
+    this.secretKey = this.configService.get<string>('TENCENT_SECRET_KEY') || '';
   }
 
   /**
@@ -33,9 +36,9 @@ export class UploadService {
       throw new HttpException('图片大小不能超过 2MB', HttpStatus.BAD_REQUEST);
     }
 
-    // 如果没有配置 API Key，使用 Base64 存储
-    if (!this.apiKey) {
-      console.log('未配置云存储 API Key，使用 Base64 存储');
+    // 如果没有配置密钥，使用 Base64 存储
+    if (!this.secretId || !this.secretKey) {
+      console.log('未配置云存储密钥，使用 Base64 存储');
       const base64 = file.buffer.toString('base64');
       const mimeType = file.mimetype;
       return `data:${mimeType};base64,${base64}`;
@@ -48,14 +51,13 @@ export class UploadService {
       const ext = file.originalname.split('.').pop() || 'png';
       const cloudPath = `page-images/${timestamp}-${randomStr}.${ext}`;
 
-      // 调用云开发 HTTP API 上传
-      const fileID = await this.uploadToCloudBase(file, cloudPath);
+      // 调用腾讯云 COS API 上传
+      const url = await this.uploadToCOS(file, cloudPath);
 
       // 返回图片访问URL
-      return fileID;
+      return url;
     } catch (error) {
       console.error('上传到云存储失败:', error);
-      // 上传失败直接抛出错误，不回退到 Base64（避免数据库字段过大）
       throw new HttpException(
         `上传到云存储失败: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -64,50 +66,60 @@ export class UploadService {
   }
 
   /**
-   * 上传到腾讯云云开发云存储
+   * 上传到腾讯云 COS
    */
-  private async uploadToCloudBase(
+  private async uploadToCOS(
     file: Express.Multer.File,
     cloudPath: string,
   ): Promise<string> {
-    // 使用云开发 HTTP API 上传文件
-    // 参考文档: https://docs.cloudbase.net/api-reference/server/server-api.html
-    
-    const url = `https://tcb-api.tencentcloudapi.com/api/v1/env/${this.envId}/storage/upload`;
-    
-    // 创建 FormData
-    const formData = new FormData();
-    formData.append('path', cloudPath);
-    
-    // 将 Buffer 转为 Uint8Array 再转为 Blob
-    const uint8Array = new Uint8Array(file.buffer);
-    const blob = new Blob([uint8Array], { type: file.mimetype });
-    formData.append('file', blob, file.originalname);
+    // COS 存储桶信息
+    const bucket = '636c-cloud1-8gl0blge9ea5f0ca-1333174272';
+    const region = 'ap-shanghai';
+    const host = `${bucket}.cos.${region}.myqcloud.com`;
+    const url = `https://${host}/${cloudPath}`;
 
+    // 生成签名
+    const timestamp = Math.floor(Date.now() / 1000);
+    const date = new Date().toISOString().split('T')[0];
+    const signTime = `${timestamp};${timestamp + 3600}`;
+
+    // 构建签名
+    const method = 'PUT';
+    const pathname = `/${cloudPath}`;
+    
+    // 签名密钥
+    const signKey = crypto
+      .createHmac('sha1', this.secretKey)
+      .update(date)
+      .digest('hex');
+    
+    // 构建签名字符串
+    const httpString = `${method}\n${pathname}\n\nhost=${host}\n`;
+    const stringToSign = `sha1\n${signTime}\n${crypto.createHash('sha1').update(httpString).digest('hex')}\n`;
+    const signature = crypto.createHmac('sha1', signKey).update(stringToSign).digest('hex');
+    
+    // 构建 Authorization
+    const authorization = `q-sign-algorithm=sha1&q-ak=${this.secretId}&q-sign-time=${signTime}&q-key-time=${signTime}&q-header-list=host&q-url-param-list=&q-signature=${signature}`;
+
+    // 上传文件
     const response = await fetch(url, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
-        'Authorization': `ApiKey ${this.apiKey}`,
+        'Authorization': authorization,
+        'Host': host,
+        'Content-Type': file.mimetype,
+        'Content-Length': file.size.toString(),
       },
-      body: formData,
+      body: file.buffer,
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('上传文件失败:', errorText);
-      throw new Error(`上传失败: ${response.status}`);
+      throw new Error(`上传失败: ${response.status} - ${errorText}`);
     }
 
-    const result = await response.json();
-    
-    if (result.code !== 'SUCCESS' && result.code !== 0 && result.code !== 'OK') {
-      console.error('上传文件失败:', result);
-      throw new Error(result.message || '上传失败');
-    }
-
-    // 返回文件访问 URL
-    // 云存储文件ID格式: cloud://envId.fileId
-    // 访问URL格式: https://envId.tcb.qcloud.la/path
+    // 返回访问 URL
     return `https://636c-cloud1-8gl0blge9ea5f0ca-1333174272.tcb.qcloud.la/${cloudPath}`;
   }
 }
