@@ -110,7 +110,7 @@ export class UploadService {
         'Content-Type': file.mimetype,
         'Content-Length': file.size.toString(),
       },
-      body: file.buffer,
+      body: new Uint8Array(file.buffer),
     });
 
     if (!response.ok) {
