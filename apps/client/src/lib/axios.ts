@@ -15,7 +15,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 响应拦截器：处理 401、429 和统一响应解包
+// 响应拦截器：处理 401 和统一响应解包
 api.interceptors.response.use(
   (response) => {
     const res = response.data;
@@ -29,14 +29,10 @@ api.interceptors.response.use(
     return res;
   },
   (error) => {
-    // 处理 429 限流错误
-    if (error.response?.status === 429) {
-      error.message = '请求过于频繁，请稍后再试';
-      error.isRateLimit = true;
-    } else if (error.response?.data?.msg) {
+    if (error.response?.data?.msg) {
       error.message = error.response.data.msg;
     }
-
+    
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
     }

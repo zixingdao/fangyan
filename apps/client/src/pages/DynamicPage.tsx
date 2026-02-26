@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/axios';
-import { ArrowLeft, Loader2, User, Lock, RefreshCw, Timer } from 'lucide-react';
+import { ArrowLeft, Loader2, User, Lock, RefreshCw, AlertCircle } from 'lucide-react';
 
 interface ComponentProps {
   text?: string;
@@ -61,10 +61,17 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
     } catch (err: any) {
       console.error('Failed to fetch page config:', err);
 
-      // 如果是 429 限流错误，延迟后自动重试
-      if (err.isRateLimit && retryCount < 3) {
-        console.log(`Rate limited, retrying in ${(retryCount + 1) * 2}s... (${retryCount + 1}/3)`);
-        setTimeout(() => fetchPageConfig(retryCount + 1), 2000 * (retryCount + 1));
+      // 处理429限流错误
+      if (err.response?.status === 429) {
+        // 如果是429错误，且重试次数小于3次，延迟后自动重试
+        if (retryCount < 3) {
+          const delay = 2000 * (retryCount + 1); // 2秒、4秒、6秒递增
+          console.log(`Rate limited (429), retrying in ${delay}ms... (${retryCount + 1}/3)`);
+          setTimeout(() => fetchPageConfig(retryCount + 1), delay);
+          return;
+        }
+        setError('请求过于频繁，请稍后再试');
+        setLoading(false);
         return;
       }
 
@@ -75,13 +82,7 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
         return;
       }
 
-      // 显示友好的错误信息
-      if (err.isRateLimit) {
-        setError('请求过于频繁，请稍后再试');
-      } else {
-        setError('加载页面配置失败，请稍后重试');
-      }
-    } finally {
+      setError('加载页面配置失败，请稍后重试');
       setLoading(false);
     }
   };
@@ -141,7 +142,6 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
   }
 
   if (error || !config || !config.isActive) {
-    const isRateLimitError = error?.includes('过于频繁');
     return (
       <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
         <div className="container mx-auto px-4 py-8">
@@ -153,25 +153,29 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
             返回
           </button>
           <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-            {isRateLimitError ? (
-              <div className="flex flex-col items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
-                  <Timer className="w-8 h-8 text-orange-500" />
+            {error ? (
+              <>
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-red-600" />
                 </div>
-                <p className="text-orange-600 font-medium">{error}</p>
-                <p className="text-sm text-gray-400">系统正在自动重试，请稍候...</p>
-              </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">加载失败</h3>
+                <p className="text-gray-500 mb-6">{error}</p>
+                <button
+                  onClick={() => fetchPageConfig()}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  重新加载
+                </button>
+              </>
             ) : (
-              <p className="text-gray-500 mb-4">{error || '页面配置不存在或未启用'}</p>
-            )}
-            {error && (
-              <button
-                onClick={() => fetchPageConfig()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                <RefreshCw className="w-4 h-4" />
-                重新加载
-              </button>
+              <>
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">页面配置不存在</h3>
+                <p className="text-gray-500">该页面尚未配置或已停用</p>
+              </>
             )}
           </div>
         </div>

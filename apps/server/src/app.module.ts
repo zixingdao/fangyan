@@ -90,12 +90,12 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       {
         name: 'short',
         ttl: 60000, // 1分钟
-        limit: 15,   // 每IP每端点5次请求
+        limit: 15,   // 每IP每端点15次请求
       },
       {
         name: 'long',
         ttl: 3600000, // 1小时
-        limit: 200,   // 每IP每小时100次请求
+        limit: 200,   // 每IP每小时200次请求
       },
     ]),
     UsersModule,
