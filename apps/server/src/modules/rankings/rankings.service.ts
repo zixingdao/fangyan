@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Ranking } from './ranking.entity';
 import { User } from '../users/user.entity';
 import { RankType, UserRole } from '@changsha/shared';
@@ -18,10 +18,11 @@ export class RankingsService {
   async getTotalRankings(limit: number = 50): Promise<any[]> {
     // 实际逻辑应该是先统计 Users 表的 total_duration，或者直接查 Rankings 表
     // 这里为了演示，我们假设 Rankings 表已经有聚合好的数据，或者我们实时从 Users 表聚合
-    
+
     // 方法1：直接从 Users 表查（实时）
+    // 只查询普通用户，排除管理员和超级管理员
     const users = await this.usersRepository.find({
-      where: { role: Not(UserRole.ADMIN) },
+      where: { role: UserRole.USER },
       order: { total_duration: 'DESC' },
       take: limit,
       select: ['id', 'name', 'school', 'total_duration', 'hometown'],
