@@ -21,6 +21,8 @@ import { Ranking } from './modules/rankings/ranking.entity';
 import { Topic } from './modules/topics/topic.entity';
 import { Log } from './modules/logs/log.entity';
 import { SystemConfig } from './modules/system/system-config.entity';
+import { PageConfig } from './modules/page-configs/page-config.entity';
+import { PageConfigsModule } from './modules/page-configs/page-configs.module';
 import { RequestCounterMiddleware } from './request-counter.middleware';
 
 @Module({
@@ -81,7 +83,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         ...configService.get('database'),
-        entities: [User, Recording, Ranking, Topic, Log, SystemConfig], // 注册所有实体
+        entities: [User, Recording, Ranking, Topic, Log, SystemConfig, PageConfig], // 注册所有实体
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
@@ -107,6 +109,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
     LogsModule,
     SystemModule,
     MonitorModule,
+    PageConfigsModule,
   ],
   controllers: [],
   providers: [
