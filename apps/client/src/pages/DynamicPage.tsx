@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/axios';
-import { ArrowLeft, Loader2, User, Lock } from 'lucide-react';
+import { ArrowLeft, Loader2, User, Lock, RefreshCw } from 'lucide-react';
 
 interface ComponentProps {
   text?: string;
@@ -47,15 +47,26 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
     fetchPageConfig();
   }, [pageType]);
 
-  const fetchPageConfig = async () => {
+  const fetchPageConfig = async (retryCount = 0) => {
     try {
       setLoading(true);
       setError(null);
       const data: PageConfig = await api.get(`/page-configs/by-type?type=${pageType}`);
-      setConfig(data);
-    } catch (err) {
+      // 如果返回 null 或 undefined，说明配置不存在
+      if (!data) {
+        setConfig(null);
+      } else {
+        setConfig(data);
+      }
+    } catch (err: any) {
       console.error('Failed to fetch page config:', err);
-      setError('加载页面配置失败');
+      // 如果是网络错误或超时，且重试次数小于3次，则自动重试
+      if (retryCount < 3 && (!err.response || err.code === 'ECONNABORTED' || err.code === 'ERR_NETWORK')) {
+        console.log(`Retrying fetch page config... (${retryCount + 1}/3)`);
+        setTimeout(() => fetchPageConfig(retryCount + 1), 1000 * (retryCount + 1));
+        return;
+      }
+      setError('加载页面配置失败，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -127,7 +138,16 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
             返回
           </button>
           <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-            <p className="text-gray-500">{error || '页面配置不存在或未启用'}</p>
+            <p className="text-gray-500 mb-4">{error || '页面配置不存在或未启用'}</p>
+            {error && (
+              <button
+                onClick={() => fetchPageConfig()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                重新加载
+              </button>
+            )}
           </div>
         </div>
       </div>
