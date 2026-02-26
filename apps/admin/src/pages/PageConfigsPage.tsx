@@ -65,6 +65,8 @@ export const PageConfigsPage = () => {
   const [configs, setConfigs] = useState<Record<string, PageConfig>>({});
   const [userRole, setUserRole] = useState<string>('');
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [cloudbaseReady, setCloudbaseReady] = useState(false);
+  const cloudbaseApp = useRef<any>(null);
 
   useEffect(() => {
     fetchConfigs();
@@ -439,8 +441,6 @@ export const PageConfigsPage = () => {
   }
 
   const isSuperAdmin = userRole === 'super_admin';
-  const cloudbaseApp = useRef<any>(null);
-  const [cloudbaseReady, setCloudbaseReady] = useState(false);
 
   // 初始化云开发并匿名登录
   useEffect(() => {
