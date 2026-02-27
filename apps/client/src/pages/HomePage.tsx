@@ -51,12 +51,12 @@ export const HomePage = () => {
           </div>
 
           <h1 className="text-4xl md:text-7xl font-bold font-brand mb-4 md:mb-6 leading-tight text-white drop-shadow-lg">
-            寻觅邵阳学院的<br/>
-            <span className="text-yellow-400">长沙人</span>
+            寻觅方言守护者<br/>
+            <span className="text-yellow-400">一期 · 长沙</span>
           </h1>
 
           <p className="text-base md:text-xl text-gray-100 mb-6 md:mb-8 leading-relaxed max-w-2xl font-light">
-            每一种方言都是文化的活化石。加入我们，用最地道的长沙话，记录这座城市的记忆。
+            每一种方言都是文化的活化石。加入我们，用最地道的乡音，记录城市的记忆。
             <br/>
             <span className="text-yellow-300 font-medium mt-2 block text-xl md:text-2xl">
               参与录制即可获得 {stats?.rewardRateRange || '80-120'}元/小时 奖励
