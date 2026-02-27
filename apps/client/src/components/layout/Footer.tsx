@@ -19,7 +19,7 @@ export const Footer = () => {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><a href="/guide" className="hover:text-white transition-colors">录制指南</a></li>
               <li><a href="/topics" className="hover:text-white transition-colors">热门话题</a></li>
-              <li><a href="/ranking" className="hover:text-white transition-colors">荣誉榜单</a></li>
+              {/* <li><a href="/ranking" className="hover:text-white transition-colors">荣誉榜单</a></li> */}
               <li><a href="/about" className="hover:text-white transition-colors">关于计划</a></li>
             </ul>
           </div>

@@ -30,7 +30,7 @@ export const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           <Link to="/" className="text-gray-600 hover:text-primary font-medium transition-colors">首页</Link>
-          <Link to="/ranking" className="text-gray-600 hover:text-primary font-medium transition-colors">排行榜</Link>
+          {/* <Link to="/ranking" className="text-gray-600 hover:text-primary font-medium transition-colors">排行榜</Link> */}
           <Link to="/guide" className="text-gray-600 hover:text-primary font-medium transition-colors">录制指南</Link>
         </nav>
 
@@ -75,7 +75,7 @@ export const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden absolute top-[70px] left-0 w-full bg-white border-b border-gray-100 shadow-lg py-4 px-4 flex flex-col gap-4">
           <Link to="/" className="text-gray-600 font-medium py-2">首页</Link>
-          <Link to="/ranking" className="text-gray-600 font-medium py-2">排行榜</Link>
+          {/* <Link to="/ranking" className="text-gray-600 font-medium py-2">排行榜</Link> */}
           <Link to="/guide" className="text-gray-600 font-medium py-2">录制指南</Link>
           <div className="h-px bg-gray-100 my-2"></div>
           {user ? (

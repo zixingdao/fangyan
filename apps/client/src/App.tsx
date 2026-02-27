@@ -4,7 +4,7 @@ import { useAuthStore } from './features/auth/hooks/useAuthStore';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
-import { RankingPage } from './pages/RankingPage';
+// import { RankingPage } from './pages/RankingPage';
 import { UploadPage } from './pages/UploadPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { GuidePage } from './pages/GuidePage';
@@ -60,7 +60,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           
           <Route path="/" element={<HomePage />} />
-          <Route path="/ranking" element={<RankingPage />} />
+          {/* <Route path="/ranking" element={<RankingPage />} /> */}
           <Route path="/guide" element={<GuidePage />} />
           
           {/* Dynamic Pages */}
