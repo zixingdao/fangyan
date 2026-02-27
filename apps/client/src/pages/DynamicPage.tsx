@@ -114,18 +114,19 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
 
     try {
       const response: any = await api.post('/auth/login', loginForm);
-      if (response.code === 200 && response.data) {
+      // axios 拦截器已经解包了响应，response 直接包含 user 和 access_token
+      if (response && response.user && response.access_token) {
         // 保存登录信息到 localStorage
         localStorage.setItem('auth-storage', JSON.stringify({
           state: {
-            user: response.data.user,
-            token: response.data.access_token,
+            user: response.user,
+            token: response.access_token,
           },
         }));
         // 登录成功，跳转到首页或个人中心
         navigate('/profile');
       } else {
-        setLoginError(response.msg || '登录失败');
+        setLoginError('登录失败');
       }
     } catch (err: any) {
       setLoginError(err.message || '登录失败，请检查账号密码');
