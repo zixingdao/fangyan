@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/axios';
+import { useAuthStore } from '../features/auth/hooks/useAuthStore';
 import { ArrowLeft, Loader2, User, Lock, RefreshCw, AlertCircle } from 'lucide-react';
 
 interface ComponentProps {
@@ -36,6 +37,7 @@ interface DynamicPageProps {
 
 export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
   const navigate = useNavigate();
+  const authLogin = useAuthStore((state) => state.login);
   const [config, setConfig] = useState<PageConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,13 +123,8 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
       // axios 拦截器已经解包了响应，response 直接包含 user 和 access_token
       if (response && response.user && response.access_token) {
         console.log('[Login] 登录成功，用户:', response.user.name);
-        // 保存登录信息到 localStorage
-        localStorage.setItem('auth-storage', JSON.stringify({
-          state: {
-            user: response.user,
-            token: response.access_token,
-          },
-        }));
+        // 使用 authStore 的 login 方法保存登录状态
+        authLogin(response.user, response.access_token);
         // 登录成功，跳转到首页或个人中心
         navigate('/profile');
       } else {
