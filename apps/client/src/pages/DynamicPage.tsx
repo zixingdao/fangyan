@@ -114,6 +114,7 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
 
     try {
       console.log('[Login] 开始登录请求，学号:', loginForm.student_id);
+      console.log('[Login] 请求URL:', '/api/auth/login');
       const response: any = await api.post('/auth/login', loginForm);
       console.log('[Login] 登录响应:', response);
 
@@ -139,7 +140,10 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
         message: err.message,
         response: err.response?.data,
         status: err.response?.status,
-        config: err.config,
+        statusText: err.response?.statusText,
+        url: err.config?.url,
+        method: err.config?.method,
+        baseURL: err.config?.baseURL,
       });
       setLoginError(err.message || '登录失败，请检查账号密码');
     } finally {
