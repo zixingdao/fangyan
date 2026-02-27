@@ -102,7 +102,7 @@ export class PageConfigsService {
             id: 'default-1',
             type: 'title',
             order: 1,
-            props: { text: '欢迎加入长沙方言守护计划', level: 1, align: 'center' },
+            props: { text: '欢迎加入方言守护计划 · 一期长沙', level: 1, align: 'center' },
           },
           {
             id: 'default-2',
@@ -131,7 +131,7 @@ export class PageConfigsService {
             id: 'default-1',
             type: 'title',
             order: 1,
-            props: { text: '加入长沙方言守护计划', level: 1, align: 'center' },
+            props: { text: '加入方言守护计划 · 一期长沙', level: 1, align: 'center' },
           },
           {
             id: 'default-2',

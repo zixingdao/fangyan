@@ -5,11 +5,11 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* 关于我们 */}
           <div>
-            <h3 className="text-lg font-bold mb-4 font-brand tracking-wider">湘音传承</h3>
+            <h3 className="text-lg font-bold mb-4 font-brand tracking-wider">方言守护计划</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              致力于保护和传承长沙方言文化，<br/>
+              致力于保护和传承方言文化，<br/>
               记录每一句地道的乡音，<br/>
-              让长沙话的声音永远流传。
+              让方言的声音永远流传。
             </p>
           </div>
 
@@ -42,8 +42,8 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-gray-700 mt-10 pt-6 text-center text-xs text-gray-500">
-          <p>© 2026 长沙方言守护计划. All rights reserved.</p>
-          <p className="mt-2">Designed with ❤️ by Changsha Dialect Team</p>
+          <p>© 2026 方言守护计划 · 一期长沙. All rights reserved.</p>
+          <p className="mt-2">Designed with ❤️ by Dialect Guardian Team</p>
         </div>
       </div>
     </footer>

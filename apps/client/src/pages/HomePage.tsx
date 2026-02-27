@@ -47,14 +47,14 @@ export const HomePage = () => {
         <div className="relative z-10 px-6 md:px-16 max-w-4xl w-full">
           <div className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-red-600/30 text-red-100 text-xs md:text-sm font-medium mb-4 md:mb-6 backdrop-blur-sm border border-red-500/30">
             <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
-            邵阳学院 × 长沙方言守护计划
+            邵阳学院 × 方言守护计划 · 一期长沙
           </div>
-          
+
           <h1 className="text-4xl md:text-7xl font-bold font-brand mb-4 md:mb-6 leading-tight text-white drop-shadow-lg">
             寻觅邵阳学院的<br/>
             <span className="text-yellow-400">长沙人</span>
           </h1>
-          
+
           <p className="text-base md:text-xl text-gray-100 mb-6 md:mb-8 leading-relaxed max-w-2xl font-light">
             每一种方言都是文化的活化石。加入我们，用最地道的长沙话，记录这座城市的记忆。
             <br/>

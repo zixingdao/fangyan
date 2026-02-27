@@ -22,8 +22,8 @@ export const Header = () => {
             湘
           </div>
           <div className="flex flex-col">
-            <span className="text-xl font-bold text-gray-800 font-brand tracking-wide">长沙方言</span>
-            <span className="text-xs text-gray-500 tracking-wider">守护计划</span>
+            <span className="text-xl font-bold text-gray-800 font-brand tracking-wide">方言守护计划</span>
+            <span className="text-xs text-gray-500 tracking-wider">一期 · 长沙</span>
           </div>
         </Link>
 

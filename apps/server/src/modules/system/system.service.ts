@@ -32,7 +32,7 @@ export class SystemService implements OnModuleInit {
     // 初始化默认配置
     const defaults = [
       // { key: 'guide_content', value: JSON.stringify(guideData) }, // 不再强制依赖此配置
-      { key: 'announcement', value: '欢迎来到长沙方言守护计划！' },
+      { key: 'announcement', value: '欢迎来到方言守护计划 · 一期长沙！' },
       { key: 'hourly_rate_min', value: '80' },
       { key: 'hourly_rate_max', value: '120' },
     ];

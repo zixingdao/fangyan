@@ -44,8 +44,8 @@ async function bootstrap() {
   // Swagger Configuration
   // patchNestJsSwagger(); // Auto-generate Swagger from Zod schemas
   const config = new DocumentBuilder()
-    .setTitle('长沙方言守护计划 API')
-    .setDescription('The Changsha Dialect Project API description')
+    .setTitle('方言守护计划 API')
+    .setDescription('The Dialect Guardian Project API description')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
