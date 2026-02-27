@@ -76,20 +76,28 @@ export const HomePage = () => {
           {/* Key Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 pt-6 md:pt-8 border-t border-white/10">
             <div>
-              <div className="text-yellow-400 text-2xl md:text-3xl font-bold font-brand mb-1">20h</div>
+              <div className="text-yellow-400 text-2xl md:text-3xl font-bold font-brand mb-1">
+                {stats?.statsConfig?.singleLimit || '20h'}
+              </div>
               <div className="text-gray-300 text-xs md:text-sm">单人录制上限</div>
             </div>
             <div>
-              <div className="text-yellow-400 text-2xl md:text-3xl font-bold font-brand mb-1">100h</div>
+              <div className="text-yellow-400 text-2xl md:text-3xl font-bold font-brand mb-1">
+                {stats?.statsConfig?.multiLimit || '100h'}
+              </div>
               <div className="text-gray-300 text-xs md:text-sm">多人对话上限</div>
             </div>
             <div>
               <div className="text-white text-2xl md:text-3xl font-bold font-brand mb-1">{stats?.totalUsers || 0}+</div>
-              <div className="text-gray-300 text-xs md:text-sm">已参与人数</div>
+              <div className="text-gray-300 text-xs md:text-sm">
+                {stats?.statsConfig?.participantsLabel || '已参与人数'}
+              </div>
             </div>
             <div>
               <div className="text-white text-2xl md:text-3xl font-bold font-brand mb-1">{stats?.totalDurationHours || 0}h</div>
-              <div className="text-gray-300 text-xs md:text-sm">已采集时长</div>
+              <div className="text-gray-300 text-xs md:text-sm">
+                {stats?.statsConfig?.durationLabel || '已采集时长'}
+              </div>
             </div>
           </div>
         </div>

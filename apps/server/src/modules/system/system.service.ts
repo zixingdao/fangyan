@@ -35,6 +35,10 @@ export class SystemService implements OnModuleInit {
       { key: 'announcement', value: '欢迎来到方言守护计划 · 一期长沙！' },
       { key: 'hourly_rate_min', value: '80' },
       { key: 'hourly_rate_max', value: '120' },
+      { key: 'stats_single_limit', value: '20h' },
+      { key: 'stats_multi_limit', value: '100h' },
+      { key: 'stats_participants_label', value: '已参与人数' },
+      { key: 'stats_duration_label', value: '已采集时长' },
     ];
 
     for (const item of defaults) {
@@ -84,7 +88,9 @@ export class SystemService implements OnModuleInit {
     const [
       minRateStr, maxRateStr,
       dr1, dr23, dr410,
-      qr1, qr23, qr410
+      qr1, qr23, qr410,
+      statsSingleLimit, statsMultiLimit,
+      statsParticipantsLabel, statsDurationLabel
     ] = await Promise.all([
       this.getValue('hourly_rate_min'),
       this.getValue('hourly_rate_max'),
@@ -94,6 +100,10 @@ export class SystemService implements OnModuleInit {
       this.getValue('quality_rank_1'),
       this.getValue('quality_rank_2_3'),
       this.getValue('quality_rank_4_10'),
+      this.getValue('stats_single_limit'),
+      this.getValue('stats_multi_limit'),
+      this.getValue('stats_participants_label'),
+      this.getValue('stats_duration_label'),
     ]);
 
     const minRate = Number(minRateStr) || 80;
@@ -121,11 +131,20 @@ export class SystemService implements OnModuleInit {
       }
     };
 
+    // 统计信息配置
+    const statsConfig = {
+      singleLimit: statsSingleLimit || '20h',
+      multiLimit: statsMultiLimit || '100h',
+      participantsLabel: statsParticipantsLabel || '已参与人数',
+      durationLabel: statsDurationLabel || '已采集时长',
+    };
+
     return {
       totalUsers,
       totalDurationHours,
       totalRewards,
       rewardRateRange, // 返回给前端展示
+      statsConfig, // 新增：首页统计信息配置
       rankingRewards, // 新增：返回动态榜单奖金
     };
   }
