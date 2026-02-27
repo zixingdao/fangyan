@@ -113,9 +113,13 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
     setLoginError(null);
 
     try {
+      console.log('[Login] 开始登录请求，学号:', loginForm.student_id);
       const response: any = await api.post('/auth/login', loginForm);
+      console.log('[Login] 登录响应:', response);
+
       // axios 拦截器已经解包了响应，response 直接包含 user 和 access_token
       if (response && response.user && response.access_token) {
+        console.log('[Login] 登录成功，用户:', response.user.name);
         // 保存登录信息到 localStorage
         localStorage.setItem('auth-storage', JSON.stringify({
           state: {
@@ -126,9 +130,17 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ pageType }) => {
         // 登录成功，跳转到首页或个人中心
         navigate('/profile');
       } else {
-        setLoginError('登录失败');
+        console.error('[Login] 登录失败，响应数据不完整:', response);
+        setLoginError('登录失败，响应数据不完整');
       }
     } catch (err: any) {
+      console.error('[Login] 登录出错:', err);
+      console.error('[Login] 错误详情:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        config: err.config,
+      });
       setLoginError(err.message || '登录失败，请检查账号密码');
     } finally {
       setLoginLoading(false);
