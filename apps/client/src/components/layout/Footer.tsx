@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export const Footer = () => {
   return (
     <footer className="bg-[#2c3e50] text-white py-12 mt-auto">
@@ -17,10 +19,10 @@ export const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4">快速链接</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="/guide" className="hover:text-white transition-colors">录制指南</a></li>
-              <li><a href="/topics" className="hover:text-white transition-colors">热门话题</a></li>
-              {/* <li><a href="/ranking" className="hover:text-white transition-colors">荣誉榜单</a></li> */}
-              <li><a href="/about" className="hover:text-white transition-colors">关于计划</a></li>
+              <li><Link to="/guide" className="hover:text-white transition-colors">录制指南</Link></li>
+              <li><Link to="/topics" className="hover:text-white transition-colors">热门话题</Link></li>
+              {/* <li><Link to="/ranking" className="hover:text-white transition-colors">荣誉榜单</Link></li> */}
+              <li><Link to="/about" className="hover:text-white transition-colors">关于计划</Link></li>
             </ul>
           </div>
 
@@ -30,19 +32,19 @@ export const Footer = () => {
             <div className="text-sm text-gray-400 space-y-2">
               <p>📍 湖南省邵阳市大祥区七里坪校区</p>
               <p>
-                <a
-                  href="#/join-plan"
+                <Link
+                  to="/join-plan"
                   className="hover:text-white transition-colors"
                 >
                   📝 加入计划
-                </a>
+                </Link>
               </p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-gray-700 mt-10 pt-6 text-center text-xs text-gray-500">
-          <p>© 2026 方言守护计划 · 一期长沙. All rights reserved.</p>
+          <p>© 2026 方言守护计划 · 一期长沙。All rights reserved.</p>
           <p className="mt-2">Designed with ❤️ by Dialect Guardian Team</p>
         </div>
       </div>
