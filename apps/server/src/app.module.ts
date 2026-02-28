@@ -33,7 +33,17 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot(
-      // 1. 优先托管静态资源目录 (static)，不进行 SPA 回退
+      // 1. 微信验证文件 - 优先匹配，不进行 SPA 回退
+      {
+        rootPath: join(__dirname, '..', 'public', 'verify'),
+        serveRoot: '/',
+        serveStaticOptions: {
+          setHeaders: (res) => {
+            res.setHeader('Cache-Control', 'no-cache');
+          },
+        },
+      },
+      // 2. 优先托管静态资源目录 (static)，不进行 SPA 回退
       {
         rootPath: join(__dirname, '..', 'public', 'user', 'static'),
         serveRoot: '/static', // 显式匹配 /static 路径
@@ -43,7 +53,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
           },
         },
       },
-      // 2. Admin 端的静态资源 (如果有冲突，建议 Admin 也改名或加前缀，目前假设 Admin 的 static 在 /admin/static)
+      // 3. Admin 端的静态资源 (如果有冲突，建议 Admin 也改名或加前缀，目前假设 Admin 的 static 在 /admin/static)
       {
         rootPath: join(__dirname, '..', 'public', 'admin', 'static'),
         serveRoot: '/admin/static',
@@ -53,7 +63,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
           },
         },
       },
-      // 3. Admin 端页面入口 (SPA)
+      // 4. Admin 端页面入口 (SPA)
       {
         rootPath: join(__dirname, '..', 'public', 'admin'),
         serveRoot: '/admin',
@@ -66,7 +76,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
           },
         },
       },
-      // 4. Client 端页面入口 (SPA) - 放在最后作为兜底
+      // 5. Client 端页面入口 (SPA) - 放在最后作为兜底
       {
         rootPath: join(__dirname, '..', 'public', 'user'),
         serveRoot: '/',
