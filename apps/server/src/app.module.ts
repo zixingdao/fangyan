@@ -1,11 +1,12 @@
 import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import configuration from './config/configuration';
+import * as fs from 'fs';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { RecordingsModule } from './modules/recordings/recordings.module';
@@ -26,6 +27,28 @@ import { PageConfigsModule } from './modules/page-configs/page-configs.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { RequestCounterMiddleware } from './request-counter.middleware';
 
+// 动态获取 public 目录路径
+const getPublicPath = (subPath: string) => {
+  // 尝试多个可能的路径
+  const possiblePaths = [
+    join(process.cwd(), 'public', subPath),
+    join(__dirname, '..', 'public', subPath),
+    join(__dirname, '..', '..', 'public', subPath),
+    resolve('public', subPath),
+  ];
+  
+  for (const path of possiblePaths) {
+    if (fs.existsSync(path)) {
+      console.log(`Found public path: ${path}`);
+      return path;
+    }
+  }
+  
+  // 默认返回第一个路径
+  console.log(`Using default public path: ${possiblePaths[0]}`);
+  return possiblePaths[0];
+};
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,7 +58,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
     ServeStaticModule.forRoot(
       // 1. 微信验证文件 - 优先匹配，不进行 SPA 回退
       {
-        rootPath: join(__dirname, '..', 'public', 'verify'),
+        rootPath: getPublicPath('verify'),
         serveRoot: '/',
         serveStaticOptions: {
           setHeaders: (res) => {
@@ -45,17 +68,17 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       },
       // 2. 优先托管静态资源目录 (static)，不进行 SPA 回退
       {
-        rootPath: join(__dirname, '..', 'public', 'user', 'static'),
-        serveRoot: '/static', // 显式匹配 /static 路径
+        rootPath: getPublicPath(join('user', 'static')),
+        serveRoot: '/static',
         serveStaticOptions: {
           setHeaders: (res) => {
             res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
           },
         },
       },
-      // 3. Admin 端的静态资源 (如果有冲突，建议 Admin 也改名或加前缀，目前假设 Admin 的 static 在 /admin/static)
+      // 3. Admin 端的静态资源
       {
-        rootPath: join(__dirname, '..', 'public', 'admin', 'static'),
+        rootPath: getPublicPath(join('admin', 'static')),
         serveRoot: '/admin/static',
         serveStaticOptions: {
           setHeaders: (res) => {
@@ -65,7 +88,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       },
       // 4. Admin 端页面入口 (SPA)
       {
-        rootPath: join(__dirname, '..', 'public', 'admin'),
+        rootPath: getPublicPath('admin'),
         serveRoot: '/admin',
         exclude: ['/api/(.*)', '/static/(.*)'],
         serveStaticOptions: {
@@ -78,7 +101,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
       },
       // 5. Client 端页面入口 (SPA) - 放在最后作为兜底
       {
-        rootPath: join(__dirname, '..', 'public', 'user'),
+        rootPath: getPublicPath('user'),
         serveRoot: '/',
         exclude: ['/api/(.*)', '/admin/(.*)', '/static/(.*)'],
         serveStaticOptions: {
