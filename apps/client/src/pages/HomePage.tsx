@@ -136,15 +136,15 @@ export const HomePage = () => {
           </div>
         </section>
 
-        {/* Phase 2 - Coming Soon */}
+        {/* Phase 2 - Now Recruiting */}
         <section className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-5 md:p-6 shadow-sm border border-blue-100">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
               <Globe className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg md:text-xl font-bold text-gray-900">二期 · 即将开启</h2>
-              <p className="text-xs text-blue-600 font-medium">敬请期待</p>
+              <h2 className="text-lg md:text-xl font-bold text-gray-900">二期 · 正在进行</h2>
+              <p className="text-xs text-blue-600 font-medium">火热招募中</p>
             </div>
           </div>
 
@@ -167,7 +167,7 @@ export const HomePage = () => {
           </div>
 
           {/* 外语口音 */}
-          <div>
+          <div className="mb-4">
             <h3 className="text-xs font-semibold text-gray-600 mb-2 flex items-center gap-1.5">
               <Globe className="w-3.5 h-3.5 text-blue-500" />
               外语口音
@@ -183,6 +183,14 @@ export const HomePage = () => {
               ))}
             </div>
           </div>
+
+          {/* 招募按钮 */}
+          <Link 
+            to="/join-guardian" 
+            className="block w-full py-2.5 bg-blue-600 text-white text-center rounded-xl font-medium hover:bg-blue-700 transition-colors"
+          >
+            立即参与录制
+          </Link>
         </section>
       </div>
 
