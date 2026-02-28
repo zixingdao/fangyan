@@ -86,12 +86,16 @@ COPY --from=build-server /app/apps/server/dist ./apps/server/dist
 # Create public directories
 RUN mkdir -p apps/server/public/user
 RUN mkdir -p apps/server/public/admin
+RUN mkdir -p apps/server/public/verify
 
 # Copy Client build to public/user
 COPY --from=build-client /app/apps/client/dist ./apps/server/public/user
 
 # Copy Admin build to public/admin
 COPY --from=build-admin /app/apps/admin/dist ./apps/server/public/admin
+
+# Copy verify files (for WeChat verification)
+COPY --from=build-server /app/apps/server/public/verify ./apps/server/public/verify
 
 # Copy other necessary files
 COPY apps/server/ecosystem.config.js ./apps/server/
