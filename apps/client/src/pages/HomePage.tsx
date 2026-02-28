@@ -116,9 +116,9 @@ export const HomePage = () => {
       </section>
 
       {/* Phase 1 & 2 Dialects Grid - 并排展示 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 items-stretch">
         {/* Phase 1 - Current */}
-        <section className="bg-gradient-to-br from-red-50 to-orange-50 rounded-3xl p-5 md:p-6 shadow-sm border-2 border-red-200">
+        <section className="bg-gradient-to-br from-red-50 to-orange-50 rounded-3xl p-5 md:p-6 shadow-sm border-2 border-red-200 flex flex-col">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg">
               <Sparkles className="w-6 h-6 text-white" />
@@ -129,7 +129,7 @@ export const HomePage = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-red-100 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 border border-red-100 shadow-sm flex-1 flex flex-col">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-red-100 to-orange-100 flex items-center justify-center text-3xl border-2 border-red-200">
                 🔥
@@ -139,12 +139,12 @@ export const HomePage = () => {
                 <p className="text-sm text-gray-500">Hunan Changsha Dialect</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-1">
               湘语代表，湖湘文化的重要载体。长沙话保留了大量古汉语词汇，是研究汉语演变的活化石。
             </p>
             <Link 
               to="/join-guardian" 
-              className="block w-full py-3 bg-gradient-to-r from-red-600 to-orange-500 text-white text-center rounded-xl font-bold hover:from-red-700 hover:to-orange-600 transition-all shadow-md"
+              className="block w-full py-3 bg-gradient-to-r from-red-600 to-orange-500 text-white text-center rounded-xl font-bold hover:from-red-700 hover:to-orange-600 transition-all shadow-md mt-auto"
             >
               立即参与录制
             </Link>
@@ -152,7 +152,7 @@ export const HomePage = () => {
         </section>
 
         {/* Phase 2 - Now Recruiting */}
-        <section className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-5 md:p-6 shadow-sm border-2 border-blue-200">
+        <section className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-5 md:p-6 shadow-sm border-2 border-blue-200 flex flex-col">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
               <Globe className="w-6 h-6 text-white" />
@@ -163,19 +163,19 @@ export const HomePage = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-blue-100 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 border border-blue-100 shadow-sm flex-1 flex flex-col">
             {/* 国内方言 */}
-            <div className="mb-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <div className="mb-3">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-red-500" />
                 国内方言
                 <span className="text-xs font-normal text-gray-400">({domesticDialects.length}种)</span>
               </h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {domesticDialects.map((dialect) => (
                   <span
                     key={dialect}
-                    className="px-2.5 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors"
+                    className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors"
                   >
                     {dialect}
                   </span>
@@ -184,17 +184,17 @@ export const HomePage = () => {
             </div>
 
             {/* 外语口音 */}
-            <div className="mb-5">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                 <Globe className="w-4 h-4 text-blue-500" />
                 外语口音
                 <span className="text-xs font-normal text-gray-400">({foreignDialects.length}种)</span>
               </h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {foreignDialects.map((dialect) => (
                   <span
                     key={dialect}
-                    className="px-2.5 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200 transition-colors"
+                    className="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200 transition-colors"
                   >
                     {dialect}
                   </span>
@@ -205,7 +205,7 @@ export const HomePage = () => {
             {/* 招募按钮 */}
             <Link 
               to="/join-guardian" 
-              className="block w-full py-3 bg-gradient-to-r from-blue-600 to-purple-500 text-white text-center rounded-xl font-bold hover:from-blue-700 hover:to-purple-600 transition-all shadow-md"
+              className="block w-full py-3 bg-gradient-to-r from-blue-600 to-purple-500 text-white text-center rounded-xl font-bold hover:from-blue-700 hover:to-purple-600 transition-all shadow-md mt-auto"
             >
               立即参与录制
             </Link>
